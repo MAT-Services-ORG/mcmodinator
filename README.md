@@ -15,7 +15,7 @@ Due to the fact than this project stills in development, We advise you to downlo
 
 On the new version, configuring the mod is directly via the pack.json file: 
 > [!IMPORTANT]
-> Comments aren't supported, please, remove them on the last version.
+> Comments aren't supported, remove them before running the modinator.
 ```json
 { // WARNING: The comments will be considered as errors by serde_json. Do not use them in the final pack.mcmeta.
 	"pack": {
