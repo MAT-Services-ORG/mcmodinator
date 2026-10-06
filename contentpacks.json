@@ -1,0 +1,20 @@
+{ // Exemple took from https://github.com/WhiseNT/kubeloader_wiki-en/wiki/Content-Packs. Do not use in 
+  "id": "example-pack",
+  "name": "Example Content Pack",
+  "description": "An example content pack demonstrating metadata format",
+  "version": "1.0.0",
+  "authors": [
+	"Alice",
+	"Bob"
+  ],
+  "dependencies": [
+	{
+	  "type": "REQUIRED",
+	  "id": "required-pack",
+	  "source": "PACK",
+	  "versionRange": "[1.0,2.0)",
+	  "reason": "Core functionality dependency",
+	  "ordering": "AFTER"
+	}
+  ]
+}

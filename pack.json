@@ -1,0 +1,32 @@
+{ // WARNING: The comments will be considered as errors by serde_json. Do not use them in the final pack.mcmeta.
+	"pack": {
+		"pack_format": 121,
+		"description": "My custom pack",
+		"supported_formats": {
+			"min_inclusive": 4,
+			"max_inclusive": 121
+		}
+	},
+	"modinator": {
+		"id": "mymod", // Will also be the name of the output file.
+		"display_name": "My Mod",
+		"mod_version": "1.0.0",
+		"authors": ["Myself"],
+		"license": "MIT",
+		"forge_version": "47"
+	},
+	"paths": { // Values can be set to None for none.
+		"icon": "./icon.png",
+		"assets": "./assets/",
+		"data": "./data/",
+		"kubeloader": { // Will require contentpacks.json.
+			"server-js": "./server_scripts/",
+			"client-js": "./client_scripts/",
+			"startup-js": "./startup_scripts/"
+		}
+	},
+	"output": {
+		"mod": 1, // Set to 1 to create a mod named "{modinator.id}-mod.jar". Set to a string for a custom filename.
+		"contentpack": 0 // Set to 1 to create a mod named "{modinator.id}-cp.zip". Set to a string for a custom filename.
+	}
+}
