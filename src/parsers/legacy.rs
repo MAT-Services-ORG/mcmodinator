@@ -8,8 +8,43 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 	} else {
 		return Err(());
 	};*/
-	let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml")?)?; // Use pack.json on the new parser.
-
+	/*match fs::read("settings.toml") {
+		Ok(_) => {
+			let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml")?)?; // Use pack.json on the new parser.
+		}
+		Err(error) => {
+			if error.kind() == io::ErrorKind::NotFound {			
+				println!(
+					"{}", "[ERROR] \"settings.toml\" not found in project !".yellow(),
+				);
+			} else {
+				println!("{}", format!("[ERROR] {}", error).red());
+			}
+		}
+	}*/
+	/*let settings: toml::Table = match fs::read_to_string("settings.toml") {
+		Ok(settings) => {
+			toml::from_str(&settings)?
+		},
+		Err(error) => {
+			if error.kind() == io::ErrorKind::NotFound {
+				println!("{}", format!("[ERROR] \"settings.toml\" not found in project").red());
+				return Err(error.into());
+			} else {
+				println!("{}", format!("[ERROR] Could not read settings.toml: {error}").red());
+				return Err(error.into());
+			}
+		}
+	};*/
+	let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml").map_err(|error| {
+		let message = if error.kind() == io::ErrorKind::NotFound {
+			format!("\"settings.toml\" not found in project")
+		} else {
+			format!("Could not read settings.toml: {error}")
+		};
+		println!("{}", format!("[ERROR] {}", message).red());
+		io::Error::new(error.kind(), message)
+	})?)?; // Use pack.json on the new parser.
 
 	let info = settings["mod_info"].as_table().unwrap();
 	let paths = settings["paths"].as_table().unwrap();
@@ -34,7 +69,9 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 			)
 			.into());
 		}
-	}
+	};
+
+	println!("[DEBUG] ForgeInput:\n{}", info["forge_version"]);
 	let forge_version = match &info["forge_version"] {
 		toml::Value::String(value) => value.clone(),
 		toml::Value::Integer(value) => value.to_string(),
@@ -45,6 +82,13 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 			).into());
 		}
 	};
+	println!("[DEBUG] PathsType:\n{}", paths.clone().to_string());
+	/* Returns:
+		[DEBUG] PathsType:
+		assets = "assets/"
+		data = "data/"
+		icon = "icon.png"
+	*/
 	Ok(ModInfo { 
 		id: info["id"].as_str().unwrap().to_string(), 
 		version: info["version"].as_str().unwrap().to_string(), 

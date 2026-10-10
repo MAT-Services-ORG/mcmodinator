@@ -30,7 +30,7 @@ struct Args {
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER")]
 	output_path: String,
 
-	/// Uses legacy parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations, Experimental)
+	/// Uses legacy parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations)
 	#[arg(short, long)]
 	legacy_parser: bool
 }
@@ -47,16 +47,6 @@ pub struct ModInfo {
 	paths: toml::map::Map<String, toml::Value> 
 }
 
-
-/*pub fn format_text(text: &str, codes: &[u32]) -> String {
-	let mut out = String::new();
-
-	for code in codes {
-		out += &format!("\x1b[{}m", code);
-	}
-
-	out + text + "\x1b[0m"
-}*/
 
 fn add_folder_to_zip(
 	zip: &mut ZipWriter<File>,
@@ -109,7 +99,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		plegacy::get()?
 	}
 	else {
-		//platest::get()?
+		println!("[INFO] Sorry, the new parser is not aviable yet. Using legacy parser..."); //platest::get()?
 		plegacy::get()?
 	};
 
