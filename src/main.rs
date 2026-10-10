@@ -1,4 +1,4 @@
-// This project is an hanced Rust equivalent of no longer supported https://github.com/T0RNATO/datapackmodinator/ script.
+// This project is an hanced Rust equivalent of https://github.com/T0RNATO/datapackmodinator/ script.
 // Voir les informations sur le fichier externe pour le tas d'amélioration et d'oublis restants.
 use serde_json::{json, Value};
 use std::fs::{self, File, /*exists*/};
@@ -8,11 +8,18 @@ use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
 //use std::env::{self, args};
 use clap::Parser;
+use colored::Colorize;
+
+#[path = "parsers/legacy.rs"]
+mod plegacy;
+
+#[path = "parsers/latest.rs"]
+mod platest;
 
 // Start defining the CLI auto parser using CLAP. For more informations: https://crates.io/crates/clap
 #[derive(Parser)]
 #[command(name = "MAT Modinator")]
-#[command(version = "Alpha PRE")]
+#[command(version = env!("CARGO_PKG_VERSION"))]
 #[command(about = "MAT Modinator\nCreate a mod using DATA, ASSETS and KubeJS standrad folders.", long_about = None)]
 struct Args {
 	/// Define project path
@@ -23,12 +30,12 @@ struct Args {
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER")]
 	output_path: String,
 
-	/// Uses old parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations, Experimental)
+	/// Uses legacy parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations, Experimental)
 	#[arg(short, long)]
-	compat_parser: bool
+	legacy_parser: bool
 }
 
-struct ModInfo {
+pub struct ModInfo {
     id: String,
     version: String,
     display_name: String,
@@ -41,7 +48,7 @@ struct ModInfo {
 }
 
 
-fn format_text(text: &str, codes: &[u32]) -> String {
+/*pub fn format_text(text: &str, codes: &[u32]) -> String {
 	let mut out = String::new();
 
 	for code in codes {
@@ -49,7 +56,7 @@ fn format_text(text: &str, codes: &[u32]) -> String {
 	}
 
 	out + text + "\x1b[0m"
-}
+}*/
 
 fn add_folder_to_zip(
 	zip: &mut ZipWriter<File>,
@@ -89,98 +96,6 @@ fn add_folder_to_zip(
 	Ok(count)
 }
 
-/*fn parse() -> Result<ModInfo, Box<dyn std::error::Error>>{
-	println!("[DEBUG] Parsing project archicture...");
-	
-	let settings: serde_json::Value = serde_json::from_str(&fs::read_to_string("pack.json")?).unwrap();
-	println!("{}", settings);
-	// Everithing that are here are dummies. There're not real working code.
-	//let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml")?)?;
-	Ok(ModInfo {
-		id: String::new(),
-		version: String::new(),
-		display_name: String::new(),
-		description: String::new(),
-		authors: Vec::new(),
-		license: String::new(),
-		forge_version: String::new(),
-		icon: true,
-		paths: toml::from_str(settings["paths"].to_string())
-	})
-}*/
-fn parse_old() -> Result<ModInfo, Box<dyn std::error::Error>>{
-	println!("[DEBUG] Parsing old project archicture... (PS: Use the new system for new functionalities.)");
-	
-	/*if Path::new("settings.toml").exists() {
-		println!("[DEBUG] Project file: {}", "settings.toml")
-	} else {
-		return Err(());
-	};*/
-	let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml")?)?; // Use pack.json on the new parser.
-
-
-	let info = settings["mod_info"].as_table().unwrap();
-	let paths = settings["paths"].as_table().unwrap();
-	println!("test: {}", settings["paths"].as_table().unwrap());
-	// Check for missing keys
-	let expected_keys = [
-		"id",
-		"version",
-		"display_name",
-		"description",
-		"authors",
-		"license",
-		"forge_version",
-	];
-
-	for key in info.keys() {
-		if !expected_keys.contains(&key.as_str()) {
-			println!(
-				"{}",
-				format_text(
-					&format!("Missing keys in settings: {}", key),
-					&[91],
-				)
-			);
-			return Err(std::io::Error::new(
-				std::io::ErrorKind::InvalidData,
-				"Missing required key in settings",
-			)
-			.into());
-		}
-	}
-	let forge_version = match &info["forge_version"] {
-		toml::Value::String(value) => value.clone(),
-		toml::Value::Integer(value) => value.to_string(),
-		_ => {
-			return Err(std::io::Error::new(
-				std::io::ErrorKind::InvalidData,
-				"forge_version must be a string or integer",
-			).into());
-		}
-	};
-	Ok(ModInfo { 
-		id: info["id"].as_str().unwrap().to_string(), 
-		version: info["version"].as_str().unwrap().to_string(), 
-		display_name: info["display_name"].as_str().unwrap().to_string(), 
-		description: info["description"].as_str().unwrap().to_string(), 
-		license: info["license"].as_str().unwrap().to_string(),
-		forge_version,
-		authors: info["authors"]
-			.as_array()
-			.unwrap()
-			.iter()
-			.map(|author| author.as_str().unwrap().to_string())
-			.collect(),
-		icon: paths
-			.get("icon")
-			.and_then(|path| path.as_str())
-			.map(Path::new)
-			.map(|path| path.is_file())
-			.unwrap_or(false),
-		paths: paths.clone()
-	})
-}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 	// Parsing arguments
@@ -190,12 +105,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	println!("MAT Modinator\nModinator status:\n  Project path: {}\n  Input path: {}", args.project_path, args.output_path);
 	std::env::set_current_dir(args.project_path)?;
 
-	let mod_info = if args.compat_parser {
-		parse_old()?
+	let mod_info = if args.legacy_parser {
+		plegacy::get()?
 	}
 	else {
-		//parse()?
-		parse_old()?
+		//platest::get()?
+		plegacy::get()?
 	};
 
 	println!("Building file..."); // Create ZIP/JAR
@@ -274,18 +189,17 @@ description="{description}"
 
 				println!("Added icon");
 			}
-
-			Err(error) if error.kind() == io::ErrorKind::NotFound => {
-				println!(
-					"{}",
-					format_text(
-						"Icon not found at provided path.",
-						&[93],
-					)
-				);
+			
+			Err(error) => {
+				if error.kind() == io::ErrorKind::NotFound {
+				
+					println!(
+						"{}", "[WARN] Icon not found at provided path.".yellow(),
+					);
+				} else {
+					println!("{}", format!("[ERROR] {}", error).red());
+				}
 			}
-
-			Err(error) => return Err(error.into()),
 		}
 	}
 
@@ -302,15 +216,15 @@ description="{description}"
 			}
 
 			Err(error) => {
-				println!(
-					"{}",
-					format_text(
-						"Datapack files not found at provided path.",
-						&[93],
-					)
-				);
-
-				println!("Error: {}", error);
+				if error
+					.downcast_ref::<io::Error>()
+					.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
+				{
+					
+					println!("{}", "[WARN] Datapack files not found at provided path.".yellow());
+				} else {
+					println!("{}", format!("[ERROR] {}", error).red());
+				}
 			}
 		}
 	}
@@ -328,15 +242,14 @@ description="{description}"
 			}
 
 			Err(error) => {
-				println!(
-					"{}",
-					format_text(
-						"Resource pack files not found at provided path.",
-						&[93],
-					)
-				);
-
-				println!("Error: {}", error);
+				if error
+					.downcast_ref::<io::Error>()
+					.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
+				{
+					println!("{}", "[WARN] Resource pack files not found at provided path.".yellow());
+				} else {
+					println!("{}", format!("[ERROR] {}", error).red());
+				}
 			}
 		}
 	}
@@ -346,12 +259,6 @@ description="{description}"
 	zip.finish()?;
 
 
-	println!(
-		"{}",
-		format_text(
-			"Done! Mod created at mod.jar",
-			&[92],
-		)
-	);
+	println!("{}", "[DONE] Mod created at mod.jar".green());
 	return Ok(());
 }
