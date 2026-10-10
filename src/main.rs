@@ -1,4 +1,4 @@
-// This project is an hanced Rust equivalent of no longer supported https://github.com/T0RNATO/datapackmodinator/ script.
+// This project is an hanced Rust equivalent of https://github.com/T0RNATO/datapackmodinator/ script.
 // Voir les informations sur le fichier externe pour le tas d'amélioration et d'oublis restants.
 use serde_json::{json, Value};
 use std::fs::{self, File, /*exists*/};
@@ -19,7 +19,7 @@ mod platest;
 // Start defining the CLI auto parser using CLAP. For more informations: https://crates.io/crates/clap
 #[derive(Parser)]
 #[command(name = "MAT Modinator")]
-#[command(version = "Alpha PRE")]
+#[command(version = env!("CARGO_PKG_VERSION"))]
 #[command(about = "MAT Modinator\nCreate a mod using DATA, ASSETS and KubeJS standrad folders.", long_about = None)]
 struct Args {
 	/// Define project path
@@ -109,7 +109,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		plegacy::get()?
 	}
 	else {
-		//parse()?
+		//platest::get()?
 		plegacy::get()?
 	};
 
