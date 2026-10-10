@@ -10,8 +10,11 @@ use zip::ZipWriter;
 use clap::Parser;
 use colored::Colorize;
 
-#[path = "parsers/compat.rs"]
-mod compat;
+#[path = "parsers/legacy.rs"]
+mod plegacy;
+
+#[path = "parsers/latest.rs"]
+mod platest;
 
 // Start defining the CLI auto parser using CLAP. For more informations: https://crates.io/crates/clap
 #[derive(Parser)]
@@ -27,9 +30,9 @@ struct Args {
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER")]
 	output_path: String,
 
-	/// Uses old parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations, Experimental)
+	/// Uses legacy parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations, Experimental)
 	#[arg(short, long)]
-	compat_parser: bool
+	legacy_parser: bool
 }
 
 pub struct ModInfo {
@@ -93,26 +96,6 @@ fn add_folder_to_zip(
 	Ok(count)
 }
 
-/*fn parse() -> Result<ModInfo, Box<dyn std::error::Error>>{
-	println!("[DEBUG] Parsing project archicture...");
-	
-	let settings: serde_json::Value = serde_json::from_str(&fs::read_to_string("pack.json")?).unwrap();
-	println!("{}", settings);
-	// Everithing that are here are dummies. There're not real working code.
-	//let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml")?)?;
-	Ok(ModInfo {
-		id: String::new(),
-		version: String::new(),
-		display_name: String::new(),
-		description: String::new(),
-		authors: Vec::new(),
-		license: String::new(),
-		forge_version: String::new(),
-		icon: true,
-		paths: toml::from_str(settings["paths"].to_string())
-	})
-}*/
-
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 	// Parsing arguments
@@ -122,12 +105,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	println!("MAT Modinator\nModinator status:\n  Project path: {}\n  Input path: {}", args.project_path, args.output_path);
 	std::env::set_current_dir(args.project_path)?;
 
-	let mod_info = if args.compat_parser {
-		compat::get()?
+	let mod_info = if args.legacy_parser {
+		plegacy::get()?
 	}
 	else {
 		//parse()?
-		compat::get()?
+		plegacy::get()?
 	};
 
 	println!("Building file..."); // Create ZIP/JAR
