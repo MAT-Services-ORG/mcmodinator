@@ -101,9 +101,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		plegacy::get()?
 	}
 	else {
-		//println!("[INFO] Sorry, the new parser is not aviable yet. Using legacy parser..."); 
 		platest::get()?
-		//plegacy::get()?
 	};
 
 	if !mod_info.icon.is_file() {
@@ -114,7 +112,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		}
 	}
 	println!("Building file..."); // Create ZIP/JAR
-	let file = File::create("mod.jar")?; // EDIT THIS PATH TO THE OUTPUT !
+	let file = File::create("mod.jar")?; // Check for future outputs ! pass
 	let mut zip = ZipWriter::new(file);
 	
 	// Fabric
