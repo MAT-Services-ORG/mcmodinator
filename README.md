@@ -11,7 +11,7 @@ Due to the fact than this project stills in development, We advise you to downlo
 > For informations about the compatibility mode, check the [DatapackModinator](https://github.com/T0RNATO/datapackmodinator) project.
 
 > [!WARNING]
-> The new version is WIP, please, use the compatibility mode for now.
+> Outputs are WIP. Considere not using them.
 
 On the new version, configuring the mod is directly via the pack.json file: 
 > [!IMPORTANT]
