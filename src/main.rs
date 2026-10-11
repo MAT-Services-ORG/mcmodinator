@@ -9,6 +9,8 @@ use zip::ZipWriter;
 //use std::env::{self, args};
 use clap::Parser;
 use colored::Colorize;
+use toml::Table;
+use std::path::PathBuf;
 
 #[path = "parsers/legacy.rs"]
 mod plegacy;
@@ -30,7 +32,7 @@ struct Args {
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER")]
 	output_path: String,
 
-	/// Uses legacy parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations, Experimental)
+	/// Uses legacy parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations)
 	#[arg(short, long)]
 	legacy_parser: bool
 }
@@ -43,20 +45,10 @@ pub struct ModInfo {
     authors: Vec<String>,
     license: String,
     forge_version: String,
-	icon: bool,
+	icon: PathBuf,
 	paths: toml::map::Map<String, toml::Value> 
 }
 
-
-/*pub fn format_text(text: &str, codes: &[u32]) -> String {
-	let mut out = String::new();
-
-	for code in codes {
-		out += &format!("\x1b[{}m", code);
-	}
-
-	out + text + "\x1b[0m"
-}*/
 
 fn add_folder_to_zip(
 	zip: &mut ZipWriter<File>,
@@ -109,12 +101,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		plegacy::get()?
 	}
 	else {
-		//platest::get()?
-		plegacy::get()?
+		platest::get()?
 	};
 
+	if !mod_info.icon.is_file() {
+		if mod_info.icon.exists() {
+			println!("{}", format!("[WARN] \"{}\" is not a file. Considering \"\".", mod_info.icon.to_str().unwrap()).yellow())
+		} else {
+			println!("{}", format!("[WARN] \"{}\" does not exists. Considering \"\".", mod_info.icon.to_str().unwrap()).yellow())
+		}
+	}
 	println!("Building file..."); // Create ZIP/JAR
-	let file = File::create("mod.jar")?;
+	let file = File::create("mod.jar")?; // Check for future outputs ! pass
 	let mut zip = ZipWriter::new(file);
 	
 	// Fabric
@@ -128,8 +126,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		"license": mod_info.license,
 	});
 
-	if mod_info.icon {
-		fabric["icon"] = Value::String("icon.png".to_string());
+	if mod_info.icon.is_file() {
+		fabric["icon"] = Value::String(mod_info.icon.to_str().unwrap().to_string());
 	}
 
 	let fabric_json = serde_json::to_string(&fabric)?;
@@ -164,7 +162,7 @@ description="{description}"
 		display_name = mod_info.display_name,
 		authors = mod_info.authors.join(", "),
 		description = mod_info.description,
-		logo = if mod_info.icon {"logoFile=\"icon.png\""} else {""}
+		logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
 	);
 
 

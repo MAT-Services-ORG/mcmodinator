@@ -19,8 +19,8 @@ On the new version, configuring the mod is directly via the pack.json file:
 ```json
 { // WARNING: The comments will be considered as errors by serde_json. Do not use them in the final pack.mcmeta.
 	"pack": {
-		"pack_format": 121,
 		"description": "My custom pack",
+		"pack_format": 121, // For RP or DP ?
 		"supported_formats": {
 			"min_inclusive": 4,
 			"max_inclusive": 121
@@ -44,9 +44,9 @@ On the new version, configuring the mod is directly via the pack.json file:
 			"startup-js": "./startup_scripts/"
 		}
 	},
-	"output": {
-		"mod": 1, // Set to 1 to create a mod named "{modinator.id}-mod.jar". Set to a string for a custom filename.
-		"contentpack": 0 // Set to 1 to create a mod named "{modinator.id}-cp.zip". Set to a string for a custom filename.
+	"output": { // Outputs are expreimental and not supported yet.
+		"mod": true, // Set to true to create a mod named "{modinator.id}-mod.jar". Set to a string for a custom filename.
+		"contentpack": false // Set to true to create a mod named "{modinator.id}-cp.zip". Set to a string for a custom filename.
 	}
 }
 ``` 

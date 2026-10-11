@@ -2,14 +2,15 @@ use crate::*;
 
 pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 	println!("[DEBUG] Parsing old project archicture... (PS: Use the new system for new functionalities.)");
-	
-	/*if Path::new("settings.toml").exists() {
-		println!("[DEBUG] Project file: {}", "settings.toml")
-	} else {
-		return Err(());
-	};*/
-	let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml")?)?; // Use pack.json on the new parser.
-
+	let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml").map_err(|error| {
+		let message = if error.kind() == io::ErrorKind::NotFound {
+			format!("\"settings.toml\" not found in project")
+		} else {
+			format!("Could not read settings.toml: {error}")
+		};
+		println!("{}", format!("[ERROR] {}", message).red());
+		io::Error::new(error.kind(), message)
+	})?)?; // Use pack.json on the new parser.
 
 	let info = settings["mod_info"].as_table().unwrap();
 	let paths = settings["paths"].as_table().unwrap();
@@ -34,7 +35,9 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 			)
 			.into());
 		}
-	}
+	};
+
+	println!("[DEBUG] ForgeInput:\n{}", info["forge_version"]);
 	let forge_version = match &info["forge_version"] {
 		toml::Value::String(value) => value.clone(),
 		toml::Value::Integer(value) => value.to_string(),
@@ -45,6 +48,13 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 			).into());
 		}
 	};
+	println!("[DEBUG] PathsType:\n{}", paths.clone().to_string());
+	/* Returns:
+		[DEBUG] PathsType:
+		assets = "assets/"
+		data = "data/"
+		icon = "icon.png"
+	*/
 	Ok(ModInfo { 
 		id: info["id"].as_str().unwrap().to_string(), 
 		version: info["version"].as_str().unwrap().to_string(), 
@@ -58,12 +68,14 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 			.iter()
 			.map(|author| author.as_str().unwrap().to_string())
 			.collect(),
-		icon: paths
-			.get("icon")
-			.and_then(|path| path.as_str())
-			.map(Path::new)
-			.map(|path| path.is_file())
-			.unwrap_or(false),
+		icon: PathBuf::from(paths["icon"].as_str()
+			.ok_or_else(|| {
+				println!("{}", format!("[ERROR] settings.toml[\"paths\"][\"icon\"] must be a string.").red());
+				return io::Error::new(
+					io::ErrorKind::InvalidData,
+					"settings.toml: paths.icon must be a string",
+				);
+			})?),
 		paths: paths.clone()
 	})
 }
