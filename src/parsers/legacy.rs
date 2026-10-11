@@ -102,7 +102,14 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 			.iter()
 			.map(|author| author.as_str().unwrap().to_string())
 			.collect(),
-		icon: PathBuf::from(paths.to_string()),
+		icon: PathBuf::from(paths["icon"].as_str()
+			.ok_or_else(|| {
+				println!("{}", format!("[ERROR] settings.toml[\"paths\"][\"icon\"] must be a string.").red());
+				return io::Error::new(
+					io::ErrorKind::InvalidData,
+					"settings.toml: paths.icon must be a string",
+				);
+			})?),
 		paths: paths.clone()
 	})
 }

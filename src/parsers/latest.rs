@@ -72,8 +72,16 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
     		.collect::<Result<Vec<_>, _>>()?,
 		license: settings["modinator"]["license"].to_string(),
 		forge_version,
-		icon: PathBuf::from(settings["paths"]["icon"].to_string()),
-		paths: format!("assets = \"{}\"\ndata = \"{}\"\nicon = \"{}\"", settings["paths"]["assets"], settings["paths"]["data"], settings["paths"]["icon"]).parse::<Table>().unwrap()
+		icon: PathBuf::from(settings["paths"]["icon"]
+			.as_str()
+			.ok_or_else(|| {
+				println!("{}", format!("[ERROR] pack.json[\"paths\"][\"icon\"] must be a string.").red());
+				return io::Error::new(
+					io::ErrorKind::InvalidData,
+					"pack.json: paths.icon must be a string",
+				);
+			})?),
+		paths: format!("assets = {}\ndata = {}\nicon = {}", settings["paths"]["assets"], settings["paths"]["data"], settings["paths"]["icon"]).parse::<Table>().unwrap()
 	})
 	/* PathsSettings will return:
 		assets = "assets/"

@@ -108,13 +108,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 	if !mod_info.icon.is_file() {
 		if mod_info.icon.exists() {
-			println!("{}", format!("[WARN] \"{}\" does not exists. Considering \"\".", mod_info.icon.to_str().unwrap()).yellow())
-		} else {
 			println!("{}", format!("[WARN] \"{}\" is not a file. Considering \"\".", mod_info.icon.to_str().unwrap()).yellow())
+		} else {
+			println!("{}", format!("[WARN] \"{}\" does not exists. Considering \"\".", mod_info.icon.to_str().unwrap()).yellow())
 		}
 	}
 	println!("Building file..."); // Create ZIP/JAR
-	let file = File::create("mod.jar")?;
+	let file = File::create("mod.jar")?; // EDIT THIS PATH TO THE OUTPUT !
 	let mut zip = ZipWriter::new(file);
 	
 	// Fabric
