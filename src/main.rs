@@ -9,6 +9,8 @@ use zip::ZipWriter;
 //use std::env::{self, args};
 use clap::Parser;
 use colored::Colorize;
+use toml::Table;
+use std::path::PathBuf;
 
 #[path = "parsers/legacy.rs"]
 mod plegacy;
@@ -43,7 +45,7 @@ pub struct ModInfo {
     authors: Vec<String>,
     license: String,
     forge_version: String,
-	icon: bool,
+	icon: PathBuf,
 	paths: toml::map::Map<String, toml::Value> 
 }
 
@@ -99,10 +101,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		plegacy::get()?
 	}
 	else {
-		println!("[INFO] Sorry, the new parser is not aviable yet. Using legacy parser..."); //platest::get()?
-		plegacy::get()?
+		//println!("[INFO] Sorry, the new parser is not aviable yet. Using legacy parser..."); 
+		platest::get()?
+		//plegacy::get()?
 	};
 
+	if !mod_info.icon.is_file() {
+		if mod_info.icon.exists() {
+			println!("{}", format!("[WARN] \"{}\" does not exists. Considering \"\".", mod_info.icon.to_str().unwrap()).yellow())
+		} else {
+			println!("{}", format!("[WARN] \"{}\" is not a file. Considering \"\".", mod_info.icon.to_str().unwrap()).yellow())
+		}
+	}
 	println!("Building file..."); // Create ZIP/JAR
 	let file = File::create("mod.jar")?;
 	let mut zip = ZipWriter::new(file);
@@ -118,8 +128,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		"license": mod_info.license,
 	});
 
-	if mod_info.icon {
-		fabric["icon"] = Value::String("icon.png".to_string());
+	if mod_info.icon.is_file() {
+		fabric["icon"] = Value::String(mod_info.icon.to_str().unwrap().to_string());
 	}
 
 	let fabric_json = serde_json::to_string(&fabric)?;
@@ -154,7 +164,7 @@ description="{description}"
 		display_name = mod_info.display_name,
 		authors = mod_info.authors.join(", "),
 		description = mod_info.description,
-		logo = if mod_info.icon {"logoFile=\"icon.png\""} else {""}
+		logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
 	);
 
 

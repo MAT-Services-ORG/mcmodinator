@@ -50,7 +50,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 	//let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml")?)?;
 	Ok(ModInfo {
 		id: settings["modinator"]["id"].to_string(),
-		version: String::new(), // Check for a way to autodetect custom versions.
+		version: settings["modinator"]["mod_version"].to_string(),
 		display_name: settings["modinator"]["display_name"].to_string(),
 		description: if settings["pack"]["description"].is_null() {String::new()} else {settings["pack"]["description"].to_string()},
 		authors: settings["modinator"]["authors"]
@@ -72,13 +72,12 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
     		.collect::<Result<Vec<_>, _>>()?,
 		license: settings["modinator"]["license"].to_string(),
 		forge_version,
-		icon: true,
-		paths: toml::from_str("assets = \"assets/\"\ndata = \"data/\"\nicon = \"icon.png\"")?
+		icon: PathBuf::from(settings["paths"]["icon"].to_string()),
+		paths: format!("assets = \"{}\"\ndata = \"{}\"\nicon = \"{}\"", settings["paths"]["assets"], settings["paths"]["data"], settings["paths"]["icon"]).parse::<Table>().unwrap()
 	})
 	/* PathsSettings will return:
 		assets = "assets/"
 		data = "data/"
 		icon = "icon.png"
 	*/
-	// */ Ok(())
 }

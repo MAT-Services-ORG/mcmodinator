@@ -102,12 +102,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 			.iter()
 			.map(|author| author.as_str().unwrap().to_string())
 			.collect(),
-		icon: paths
-			.get("icon")
-			.and_then(|path| path.as_str())
-			.map(Path::new)
-			.map(|path| path.is_file())
-			.unwrap_or(false),
+		icon: PathBuf::from(paths.to_string()),
 		paths: paths.clone()
 	})
 }
