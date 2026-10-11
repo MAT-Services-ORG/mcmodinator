@@ -2,40 +2,6 @@ use crate::*;
 
 pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 	println!("[DEBUG] Parsing old project archicture... (PS: Use the new system for new functionalities.)");
-	
-	/*if Path::new("settings.toml").exists() {
-		println!("[DEBUG] Project file: {}", "settings.toml")
-	} else {
-		return Err(());
-	};*/
-	/*match fs::read("settings.toml") {
-		Ok(_) => {
-			let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml")?)?; // Use pack.json on the new parser.
-		}
-		Err(error) => {
-			if error.kind() == io::ErrorKind::NotFound {			
-				println!(
-					"{}", "[ERROR] \"settings.toml\" not found in project !".yellow(),
-				);
-			} else {
-				println!("{}", format!("[ERROR] {}", error).red());
-			}
-		}
-	}*/
-	/*let settings: toml::Table = match fs::read_to_string("settings.toml") {
-		Ok(settings) => {
-			toml::from_str(&settings)?
-		},
-		Err(error) => {
-			if error.kind() == io::ErrorKind::NotFound {
-				println!("{}", format!("[ERROR] \"settings.toml\" not found in project").red());
-				return Err(error.into());
-			} else {
-				println!("{}", format!("[ERROR] Could not read settings.toml: {error}").red());
-				return Err(error.into());
-			}
-		}
-	};*/
 	let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml").map_err(|error| {
 		let message = if error.kind() == io::ErrorKind::NotFound {
 			format!("\"settings.toml\" not found in project")
