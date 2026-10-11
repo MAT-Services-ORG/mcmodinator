@@ -36,8 +36,10 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 	};
 
 	let forge_version = match &settings["modinator"]["forge_version"] {
-		value => value.clone().to_string(),
+		serde_json::Value::String(value) => value.clone(),
+    	serde_json::Value::Number(value) if value.is_i64() || value.is_u64() => value.to_string(),
 		_ => {
+			println!("{}", format!("[ERROR] \"forge_version\" must be a string or integer").red());
 			return Err(std::io::Error::new(
 				std::io::ErrorKind::InvalidData,
 				"forge_version must be a string or integer",
@@ -47,13 +49,29 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 	// Everithing that are here are dummies. There're not real working code.
 	//let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml")?)?;
 	Ok(ModInfo {
-		id: String::new(),
-		version: String::new(),
-		display_name: String::new(),
-		description: String::new(),
-		authors: Vec::new(),
-		license: String::new(),
-		forge_version: String::new(),
+		id: settings["modinator"]["id"].to_string(),
+		version: String::new(), // Check for a way to autodetect custom versions.
+		display_name: settings["modinator"]["display_name"].to_string(),
+		description: if settings["pack"]["description"].is_null() {String::new()} else {settings["pack"]["description"].to_string()},
+		authors: settings["modinator"]["authors"]
+			.as_array()
+			.ok_or_else(|| {
+						println!("{}", format!("[ERROR] PACK.JSON: \"authors\" must be an array:\n     like: [\"author1\", \"author2\", etc...]").red());
+						return io::Error::new(io::ErrorKind::InvalidData, "authors must be an array");
+					})?
+    		.iter()
+			.map(|author| {
+				author
+					.as_str()
+					.map(String::from)
+					.ok_or_else(||	{
+						println!("{}", format!("[ERROR] PACK.JSON: Each author in \"authors\" must be a string:\n     like: [\"author1\", \"author2\", etc...]").red());
+						return io::Error::new(io::ErrorKind::InvalidData, "each author must be a string");
+					})
+    		})
+    		.collect::<Result<Vec<_>, _>>()?,
+		license: settings["modinator"]["license"].to_string(),
+		forge_version,
 		icon: true,
 		paths: toml::from_str("assets = \"assets/\"\ndata = \"data/\"\nicon = \"icon.png\"")?
 	})
