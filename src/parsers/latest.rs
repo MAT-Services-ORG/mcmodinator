@@ -81,7 +81,14 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 					"pack.json: paths.icon must be a string",
 				);
 			})?),
-		paths: format!("assets = {}\ndata = {}\nicon = {}", settings["paths"]["assets"], settings["paths"]["data"], settings["paths"]["icon"]).parse::<Table>().unwrap()
+		paths: 
+			format!(
+				"assets = {}\ndata = {}\nicon = {}", 
+				if settings["paths"]["assets"].is_string() {settings["paths"]["assets"].as_str().unwrap()} else {""}, 
+				if settings["paths"]["data"].is_string() {settings["paths"]["data"].as_str().unwrap()} else {""}, 
+				if settings["paths"]["icon"].is_string() {settings["paths"]["icon"].as_str().unwrap()} else {""}
+			)
+			.parse::<Table>().unwrap()
 	})
 	/* PathsSettings will return:
 		assets = "assets/"

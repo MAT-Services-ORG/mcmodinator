@@ -176,26 +176,28 @@ description="{description}"
 
 	// Icon
 	if let Some(icon_path) = mod_info.paths.get("icon").and_then(|x| x.as_str()) {
-		match fs::read(icon_path) {
-			Ok(data) => {
-				zip.start_file(
-					"icon.png",
-					SimpleFileOptions::default(),
-				)?;
+		if !icon_path.is_empty() {
+			match fs::read(icon_path) {
+				Ok(data) => {
+					zip.start_file(
+						"icon.png",
+						SimpleFileOptions::default(),
+					)?;
 
-				zip.write_all(&data)?;
+					zip.write_all(&data)?;
 
-				println!("Added icon");
-			}
-			
-			Err(error) => {
-				if error.kind() == io::ErrorKind::NotFound {
+					println!("Added icon");
+				}
 				
-					println!(
-						"{}", "[WARN] Icon not found at provided path.".yellow(),
-					);
-				} else {
-					println!("{}", format!("[ERROR] {}", error).red());
+				Err(error) => {
+					if error.kind() == io::ErrorKind::NotFound {
+					
+						println!(
+							"{}", "[WARN] Icon not found at provided path.".yellow(),
+						);
+					} else {
+						println!("{}", format!("[ERROR] {}", error).red());
+					}
 				}
 			}
 		}
@@ -204,24 +206,26 @@ description="{description}"
 
 	// Datapack
 	if let Some(data_path) = mod_info.paths.get("data").and_then(|x| x.as_str()) {
-		match add_folder_to_zip(
-			&mut zip,
-			Path::new(data_path),
-			"data",
-		) {
-			Ok(count) => {
-				println!("Added {} datapack files", count);
-			}
+		if !data_path.is_empty() {
+			match add_folder_to_zip(
+				&mut zip,
+				Path::new(data_path),
+				"data",
+			) {
+				Ok(count) => {
+					println!("Added {} datapack files", count);
+				}
 
-			Err(error) => {
-				if error
-					.downcast_ref::<io::Error>()
-					.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
-				{
-					
-					println!("{}", "[WARN] Datapack files not found at provided path.".yellow());
-				} else {
-					println!("{}", format!("[ERROR] {}", error).red());
+				Err(error) => {
+					if error
+						.downcast_ref::<io::Error>()
+						.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
+					{
+						
+						println!("{}", "[WARN] Datapack files not found at provided path.".yellow());
+					} else {
+						println!("{}", format!("[ERROR] {}", error).red());
+					}
 				}
 			}
 		}
@@ -230,23 +234,25 @@ description="{description}"
 
 	// Resource pack
 	if let Some(assets_path) = mod_info.paths.get("assets").and_then(|x| x.as_str()) {
-		match add_folder_to_zip(
-			&mut zip,
-			Path::new(assets_path),
-			"assets",
-		) {
-			Ok(count) => {
-				println!("Added {} resource pack files", count);
-			}
+		if !assets_path.is_empty() {
+			match add_folder_to_zip(
+				&mut zip,
+				Path::new(assets_path),
+				"assets",
+			) {
+				Ok(count) => {
+					println!("Added {} resource pack files", count);
+				}
 
-			Err(error) => {
-				if error
-					.downcast_ref::<io::Error>()
-					.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
-				{
-					println!("{}", "[WARN] Resource pack files not found at provided path.".yellow());
-				} else {
-					println!("{}", format!("[ERROR] {}", error).red());
+				Err(error) => {
+					if error
+						.downcast_ref::<io::Error>()
+						.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
+					{
+						println!("{}", "[WARN] Resource pack files not found at provided path.".yellow());
+					} else {
+						println!("{}", format!("[ERROR] {}", error).red());
+					}
 				}
 			}
 		}
