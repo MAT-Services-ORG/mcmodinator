@@ -18,6 +18,9 @@ mod plegacy;
 #[path = "parsers/latest.rs"]
 mod platest;
 
+#[path = "builders/mod.rs"]
+mod bmod;
+
 // Start defining the CLI auto parser using CLAP. For more informations: https://crates.io/crates/clap
 #[derive(Parser)]
 #[command(name = "MAT Modinator")]
@@ -31,6 +34,14 @@ struct Args {
 	/// Define output folder
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER")]
 	output_path: String,
+
+	/// Set Mod output [default: <ID>-mod.jar]
+	#[arg(short, long, default_value_t = "True".to_string(), hide_default_value = true, value_name = "BOOL or FILENAME")]
+	mod_build: String,
+
+	/// Set ContentPack output [default: <ID>-CPack.jar]
+	#[arg(short, long, default_value_t = "False".to_string(), hide_default_value = true, value_name = "BOOL or FILENAME")]
+	cpack_build: String,
 
 	/// Uses legacy parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations)
 	#[arg(short, long)]
@@ -111,8 +122,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 			println!("{}", format!("[WARN] \"{}\" does not exists. Considering \"\".", mod_info.icon.to_str().unwrap()).yellow())
 		}
 	}
-	println!("Building file..."); // Create ZIP/JAR
-	let file = File::create("mod.jar")?; // Check for future outputs ! pass
+
+	if match args.mod_build.to_lowercase().as_str() {
+		"false" => false,
+		"f" => false,
+		"no" => false,
+		"n" => false,
+		"none" => false,
+		_ => true
+	} {bmod::build()}
+	println!("[INFO] Building file..."); // Create ZIP/JAR
+	let file = File::create(format!("{}-mod.jar", mod_info.id))?; // TODO: Check for future outputs !
 	let mut zip = ZipWriter::new(file);
 	
 	// Fabric

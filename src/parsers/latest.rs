@@ -12,7 +12,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			};
 			println!("{}", format!("[ERROR] {}", message).red());
 			io::Error::new(error.kind(), message)
-		})?
+		})? // FIXME: Replace the "?" by ".map_err()" function to avoid random error thrown like coments in JSON.
 	)?;
 	println!("{settings}");
 
@@ -46,8 +46,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			).into());
 		}
 	};
-	// Everithing that are here are dummies. There're not real working code.
-	//let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml")?)?;
+	
 	Ok(ModInfo {
 		id: settings["modinator"]["id"].to_string(),
 		version: settings["modinator"]["mod_version"].to_string(),
