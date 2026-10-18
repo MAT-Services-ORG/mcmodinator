@@ -55,12 +55,26 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 	};
 	
 	Ok(ModInfo {
-		id: settings["modinator"]["id"].as_str()
+		id: settings["modinator"]["id"]
+			.as_str()
 			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "id must be a string"))?
 			.to_owned(),
-		version: settings["modinator"]["mod_version"].to_string(), // TODO: Verify if subquotes are problematic.
-		display_name: settings["modinator"]["display_name"].to_string(),
-		description: if settings["pack"]["description"].is_null() {String::new()} else {settings["pack"]["description"].to_string()},
+		version: settings["modinator"]["mod_version"]
+			.as_str()
+			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "version must be a string"))?
+			.to_owned(), // DEBUG: Verify if subquotes are problematic.
+		display_name: settings["modinator"]["display_name"]
+			.as_str()
+			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "display_name must be a string"))?
+			.to_owned(),
+		description: if settings["pack"]["description"].is_null() {
+				String::new()
+			} else {
+				settings["pack"]["description"]
+					.as_str()
+					.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "description must be a string"))?
+					.to_owned()
+			},
 		authors: settings["modinator"]["authors"]
 			.as_array()
 			.ok_or_else(|| {
@@ -78,7 +92,10 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 					})
     		})
     		.collect::<Result<Vec<_>, _>>()?,
-		license: settings["modinator"]["license"].to_string(),
+		license: settings["modinator"]["license"]
+			.as_str()
+			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "license must be a string"))?
+			.to_owned(),
 		forge_version,
 		icon: PathBuf::from(settings["paths"]["icon"]
 			.as_str()
@@ -96,7 +113,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				if settings["paths"]["data"].is_string() {settings["paths"]["data"].as_str().unwrap()} else {""}, 
 				if settings["paths"]["icon"].is_string() {settings["paths"]["icon"].as_str().unwrap()} else {""}
 			)
-			.parse::<Table>().unwrap() // TODO: Add unwrap_or error to avoid panicks.
+			.parse::<Table>().unwrap() // TOFIX: Add unwrap_or error to avoid panicks.
 	})
 	/* PathsSettings will return:
 		assets = "assets/"
