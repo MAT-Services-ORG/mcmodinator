@@ -58,7 +58,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		id: settings["modinator"]["id"].as_str()
 			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "id must be a string"))?
 			.to_owned(),
-		version: settings["modinator"]["mod_version"].to_string(),
+		version: settings["modinator"]["mod_version"].to_string(), // TODO: Verify if subquotes are problematic.
 		display_name: settings["modinator"]["display_name"].to_string(),
 		description: if settings["pack"]["description"].is_null() {String::new()} else {settings["pack"]["description"].to_string()},
 		authors: settings["modinator"]["authors"]
@@ -96,7 +96,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				if settings["paths"]["data"].is_string() {settings["paths"]["data"].as_str().unwrap()} else {""}, 
 				if settings["paths"]["icon"].is_string() {settings["paths"]["icon"].as_str().unwrap()} else {""}
 			)
-			.parse::<Table>().unwrap()
+			.parse::<Table>().unwrap() // TODO: Add unwrap_or error to avoid panicks.
 	})
 	/* PathsSettings will return:
 		assets = "assets/"
