@@ -1,6 +1,6 @@
 // This project is an hanced Rust equivalent of https://github.com/T0RNATO/datapackmodinator/ script.
 // Voir les informations sur le fichier externe pour le tas d'amélioration et d'oublis restants.
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::fs::{self, File, /*exists*/};
 use std::io::{self, Write};
 use std::path::Path;
@@ -21,12 +21,15 @@ mod platest;
 #[path = "builders/mod.rs"]
 mod bmod;
 
+#[path = "doc.rs"]
+mod doc;
+
 // Start defining the CLI auto parser using CLAP. For more informations: https://crates.io/crates/clap
 #[derive(Parser)]
 #[command(name = "MAT Modinator")]
 #[command(version = env!("CARGO_PKG_VERSION"))]
 #[command(about = "MAT Modinator\nCreate a mod using DATA, ASSETS and KubeJS standrad folders.", long_about = None)]
-struct Args { // TODO: Add a syntax help command.
+struct Args {
 	/// Define project path
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER", help_heading = "Project Options")]
 	project_path: String,
@@ -40,12 +43,16 @@ struct Args { // TODO: Add a syntax help command.
 	mod_build: String,
 
 	/// Set ContentPack output [default: False (Set to "<ID>-CPack.jar" if True.)]
-	#[arg(short, long, default_value_t = "False".to_string(), hide_default_value = true, value_name = "BOOL or FILENAME", help_heading = "Build Options")] // TODO: Remove outputs from pack.json.
+	#[arg(short, long, default_value_t = "False".to_string(), hide_default_value = true, value_name = "BOOL or FILENAME", help_heading = "Build Options")]
 	cpack_build: String,
 
 	/// Uses legacy parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations)
 	#[arg(short, long)]
-	legacy_parser: bool
+	legacy_parser: bool,
+
+	/// Print documentation
+	#[arg(short, long, num_args = 0..=1, default_missing_value = "MAIN", hide_default_value = true, value_name = "TOPIC")]
+	doc: Option<String>
 }
 
 pub struct ModInfo {
@@ -103,6 +110,11 @@ fn add_folder_to_zip(
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 	// Parsing arguments
 	let args: Args = Args::parse();
+	match args.doc.as_deref() {
+		None => {}
+		Some("MAIN") => {doc::doc("MAIN"); return Ok(())}
+		Some(topic) => {doc::doc(topic); return Ok(())}
+	}
 
 	// Summurizing and applying values
 	println!("MAT Modinator\nModinator status:\n  Project path: {}\n  Input path: {}", args.project_path, args.output_path);
