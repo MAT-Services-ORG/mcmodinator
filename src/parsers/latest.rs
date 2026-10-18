@@ -42,6 +42,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		}
 	};
 	
+	if !settings["paths"]["kubeloader"].is_null() {println!("{}", "[WARN] KUBELOADER is not supported yet. Check in newer versions: https://github.com/MAT-Services-ORG/mcmodinator/releases".yellow())} // TODO: KUBELOADER support.
 	Ok(ModInfo {
 		id: settings["modinator"]["id"]
 			.as_str()

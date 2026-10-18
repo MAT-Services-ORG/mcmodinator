@@ -68,7 +68,8 @@ description="{description}"
 
 	zip.write_all(forge_toml.as_bytes())?;
 
-
+	// TODO: NeoForge
+	
 	// Icon
 	if let Some(icon_path) = mod_info.paths.get("icon").and_then(|x| x.as_str()) {
 		if !icon_path.is_empty() {
