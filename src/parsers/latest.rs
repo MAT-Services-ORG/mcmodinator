@@ -5,15 +5,23 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 	
 	let settings: serde_json::Value = serde_json::from_str(
 		&fs::read_to_string("pack.json").map_err(|error| {
-			let message = if error.kind() == io::ErrorKind::NotFound {
-				format!("\"pack.json\" not found in project")
+			let msg = if error.kind() == io::ErrorKind::NotFound {
+				"\"pack.json\" not found in project".to_string()
 			} else {
 				format!("Could not read \"pack.json\": {error}")
 			};
-			println!("{}", format!("[ERROR] {}", message).red());
-			io::Error::new(error.kind(), message)
-		})? // FIXME: Replace the "?" by ".map_err()" function to avoid random error thrown like coments in JSON.
-	)?;
+			println!("{}", format!("[ERROR] {}", msg).red());
+			io::Error::new(error.kind(), msg)
+		})? 
+	).map_err(|error| {
+		let msg = if error.classify() == serde_json::error::Category::Syntax {
+			"Cannot read \"pack.json\". Have you removed the comments?".to_string()
+		} else {
+			error.to_string()
+		};
+		println!("{}", format!("[ERROR] {}", msg).red());
+		io::Error::new(serde_json::Error::io_error_kind(&error).unwrap_or(io::ErrorKind::InvalidData), msg)
+	})?;
 	println!("{settings}");
 
 	let expected_keys = [

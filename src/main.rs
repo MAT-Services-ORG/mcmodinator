@@ -26,21 +26,21 @@ mod bmod;
 #[command(name = "MAT Modinator")]
 #[command(version = env!("CARGO_PKG_VERSION"))]
 #[command(about = "MAT Modinator\nCreate a mod using DATA, ASSETS and KubeJS standrad folders.", long_about = None)]
-struct Args {
+struct Args { // TODO: Add a syntax help command.
 	/// Define project path
-	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER")]
+	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER", help_heading = "Project Options")]
 	project_path: String,
 
 	/// Define output folder
-	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER")]
+	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER", help_heading = "Project Options")]
 	output_path: String,
 
 	/// Set Mod output [default: <ID>-mod.jar]
-	#[arg(short, long, default_value_t = "True".to_string(), hide_default_value = true, value_name = "BOOL or FILENAME")]
+	#[arg(short, long, default_value_t = "True".to_string(), hide_default_value = true, value_name = "BOOL or FILENAME", help_heading = "Build Options")]
 	mod_build: String,
 
-	/// Set ContentPack output [default: <ID>-CPack.jar]
-	#[arg(short, long, default_value_t = "False".to_string(), hide_default_value = true, value_name = "BOOL or FILENAME")]
+	/// Set ContentPack output [default: False (Set to "<ID>-CPack.jar" if True.)]
+	#[arg(short, long, default_value_t = "False".to_string(), hide_default_value = true, value_name = "BOOL or FILENAME", help_heading = "Build Options")] // TODO: Remove outputs from pack.json.
 	cpack_build: String,
 
 	/// Uses legacy parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations)
