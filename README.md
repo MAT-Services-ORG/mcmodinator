@@ -43,10 +43,6 @@ On the new version, configuring the mod is directly via the pack.json file:
 			"client-js": "./client_scripts/",
 			"startup-js": "./startup_scripts/"
 		}
-	},
-	"output": { // Outputs are expreimental and not supported yet.
-		"mod": true, // Set to true to create a mod named "{modinator.id}-mod.jar". Set to a string for a custom filename.
-		"contentpack": false // Set to true to create a mod named "{modinator.id}-cp.zip". Set to a string for a custom filename.
 	}
 }
 ``` 

@@ -22,7 +22,6 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		println!("{}", format!("[ERROR] {}", msg).red());
 		io::Error::new(serde_json::Error::io_error_kind(&error).unwrap_or(io::ErrorKind::InvalidData), msg)
 	})?;
-	println!("{settings}");
 
 	let expected_keys = [
 		"id",
@@ -56,7 +55,9 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 	};
 	
 	Ok(ModInfo {
-		id: settings["modinator"]["id"].to_string(),
+		id: settings["modinator"]["id"].as_str()
+			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "id must be a string"))?
+			.to_owned(),
 		version: settings["modinator"]["mod_version"].to_string(),
 		display_name: settings["modinator"]["display_name"].to_string(),
 		description: if settings["pack"]["description"].is_null() {String::new()} else {settings["pack"]["description"].to_string()},
@@ -90,7 +91,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			})?),
 		paths: 
 			format!(
-				"assets = {}\ndata = {}\nicon = {}", 
+				"assets = \"{}\"\ndata = \"{}\"\nicon = \"{}\"", 
 				if settings["paths"]["assets"].is_string() {settings["paths"]["assets"].as_str().unwrap()} else {""}, 
 				if settings["paths"]["data"].is_string() {settings["paths"]["data"].as_str().unwrap()} else {""}, 
 				if settings["paths"]["icon"].is_string() {settings["paths"]["icon"].as_str().unwrap()} else {""}

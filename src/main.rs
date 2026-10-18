@@ -131,5 +131,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		"none" => false,
 		_ => true
 	} {bmod::build(mod_info)?}
+	println!("{}", "[DONE] Finished execution !".green());
 	return Ok(());
 }

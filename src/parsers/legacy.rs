@@ -56,7 +56,9 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 		icon = "icon.png"
 	*/
 	Ok(ModInfo { 
-		id: info["id"].as_str().unwrap().to_string(), 
+		id: info["id"].as_str()
+			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "id must be a string"))?
+			.to_owned(), 
 		version: info["version"].as_str().unwrap().to_string(), 
 		display_name: info["display_name"].as_str().unwrap().to_string(), 
 		description: info["description"].as_str().unwrap().to_string(), 
