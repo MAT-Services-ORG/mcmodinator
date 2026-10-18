@@ -15,6 +15,7 @@ use std::path::PathBuf;
 #[path = "parsers/legacy.rs"] mod plegacy;
 #[path = "parsers/latest.rs"] mod platest;
 #[path = "builders/mod.rs"] mod bmod;
+#[path = "builders/cpack.rs"] mod bcpack;
 #[path = "doc.rs"] mod doc;
 
 #[derive(Parser)] #[command(name = "MAT Modinator", version = env!("CARGO_PKG_VERSION"), about = "MAT Modinator\nCreate a mod using DATA, ASSETS and KubeJS standrad folders.", long_about = None)] struct Args {
@@ -126,13 +127,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	}
 
 	if match args.mod_build.to_lowercase().as_str() {
-		"false" => false,
-		"f" => false,
-		"no" => false,
-		"n" => false,
-		"none" => false,
+		"false" | "f" | "no" | "n" | "none" => false,
 		_ => true
-	} {bmod::build(mod_info)?}
+	} {bmod::build(&mod_info, args.mod_build.to_lowercase().as_str())?}
+	if match args.cpack_build.to_lowercase().as_str() {
+		"false" | "f" | "no" | "n" | "none" => false,
+		_ => true
+	} {bcpack::build(/*&mod_info, args.mod_build.to_lowercase().as_str()*/)?}
 	println!("{}", "[DONE] Finished execution !".green());
 	return Ok(());
 }

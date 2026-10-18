@@ -1,8 +1,13 @@
 use crate::*;
 
-pub fn build(mod_info: ModInfo) -> Result<(), Box<dyn std::error::Error>> {
+pub fn build(mod_info: &ModInfo, mod_build: &str) -> Result<(), Box<dyn std::error::Error>> {
     println!("[INFO] Building file..."); // Create ZIP/JAR
-	let file = File::create(format!("{}-mod.jar", mod_info.id))?; // TODO: Check for future outputs !
+	let file = File::create(
+		match mod_build {
+			"true" | "t" | "yes" | "y" => format!("{}-mod.jar", mod_info.id),
+			_ => mod_build.to_string()
+		}
+	)?;
 	let mut zip = ZipWriter::new(file);
 	
 	// Fabric
