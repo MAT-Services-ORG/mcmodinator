@@ -4,14 +4,14 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 	println!("[DEBUG] Parsing project archicture...");
 	
 	let settings: serde_json::Value = serde_json::from_str(
-		&fs::read_to_string("pack.json").map_err(|error| {
-			let msg = if error.kind() == io::ErrorKind::NotFound {
+		&fs::read_to_string("pack.json").map_err(|err| {
+			let msg = if err.kind() == io::ErrorKind::NotFound {
 				"\"pack.json\" not found in project".to_string()
 			} else {
-				format!("Could not read \"pack.json\": {error}")
+				format!("Could not read \"pack.json\": {err}")
 			};
 			println!("{}", format!("[ERROR] {}", msg).red());
-			io::Error::new(error.kind(), msg)
+			io::Error::new(err.kind(), msg)
 		})? 
 	).map_err(|error| {
 		let msg = if error.classify() == serde_json::error::Category::Syntax {
@@ -41,19 +41,8 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			).into());
 		}
 	};
-
-	let forge_version = match &settings["modinator"]["forge_version"] {
-		serde_json::Value::String(value) => value.clone(),
-    	serde_json::Value::Number(value) if value.is_i64() || value.is_u64() => value.to_string(),
-		_ => {
-			println!("{}", format!("[ERROR] \"forge_version\" must be a string or integer").red());
-			return Err(std::io::Error::new(
-				std::io::ErrorKind::InvalidData,
-				"forge_version must be a string or integer",
-			).into());
-		}
-	};
 	
+	if !settings["paths"]["kubeloader"].is_null() {println!("{}", "[WARN] KUBELOADER is not supported yet. Check in newer versions: https://github.com/MAT-Services-ORG/mcmodinator/releases".yellow())} // TODO: KUBELOADER support.
 	Ok(ModInfo {
 		id: settings["modinator"]["id"]
 			.as_str()
@@ -62,7 +51,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		version: settings["modinator"]["mod_version"]
 			.as_str()
 			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "version must be a string"))?
-			.to_owned(), // DEBUG: Verify if subquotes are problematic.
+			.to_owned(),
 		display_name: settings["modinator"]["display_name"]
 			.as_str()
 			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "display_name must be a string"))?
@@ -96,7 +85,17 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			.as_str()
 			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "license must be a string"))?
 			.to_owned(),
-		forge_version,
+		forge_version: match &settings["modinator"]["forge_version"] {
+			serde_json::Value::String(value) => value.clone(),
+			serde_json::Value::Number(value) if value.is_i64() || value.is_u64() => value.to_string(),
+			_ => {
+				println!("{}", format!("[ERROR] \"forge_version\" must be a string or integer").red());
+				return Err(std::io::Error::new(
+					std::io::ErrorKind::InvalidData,
+					"forge_version must be a string or integer",
+				).into());
+			}
+		},
 		icon: PathBuf::from(settings["paths"]["icon"]
 			.as_str()
 			.ok_or_else(|| {
@@ -113,7 +112,10 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				if settings["paths"]["data"].is_string() {settings["paths"]["data"].as_str().unwrap()} else {""}, 
 				if settings["paths"]["icon"].is_string() {settings["paths"]["icon"].as_str().unwrap()} else {""}
 			)
-			.parse::<Table>().unwrap() // TOFIX: Add unwrap_or error to avoid panicks.
+			.parse::<Table>().map_err(|err| {
+				println!("{}", format!("[ERROR] {err}").red());
+				return io::Error::new(io::ErrorKind::InvalidData, err);
+			})?
 	})
 	/* PathsSettings will return:
 		assets = "assets/"

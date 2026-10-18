@@ -12,24 +12,16 @@ use colored::Colorize;
 use toml::Table;
 use std::path::PathBuf;
 
-#[path = "parsers/legacy.rs"]
-mod plegacy;
+#[path = "parsers/legacy.rs"] mod plegacy;
+#[path = "parsers/latest.rs"] mod platest;
+#[path = "builders/mod.rs"] mod bmod;
+#[path = "builders/cpack.rs"] mod bcpack;
+#[path = "doc.rs"] mod doc;
 
-#[path = "parsers/latest.rs"]
-mod platest;
+#[derive(Parser)] #[command(name = "MAT Modinator", version = env!("CARGO_PKG_VERSION"), about = "MAT Modinator\nCreate a mod using DATA, ASSETS and KubeJS standrad folders.", long_about = None)] struct Args {
+	// Start defining the CLI auto parser using CLAP. For more informations: https://crates.io/crates/clap
 
-#[path = "builders/mod.rs"]
-mod bmod;
-
-#[path = "doc.rs"]
-mod doc;
-
-// Start defining the CLI auto parser using CLAP. For more informations: https://crates.io/crates/clap
-#[derive(Parser)]
-#[command(name = "MAT Modinator")]
-#[command(version = env!("CARGO_PKG_VERSION"))]
-#[command(about = "MAT Modinator\nCreate a mod using DATA, ASSETS and KubeJS standrad folders.", long_about = None)]
-struct Args {
+	
 	/// Define project path
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER", help_heading = "Project Options")]
 	project_path: String,
@@ -66,7 +58,6 @@ pub struct ModInfo {
 	icon: PathBuf,
 	paths: toml::map::Map<String, toml::Value> 
 }
-
 
 fn add_folder_to_zip(
 	zip: &mut ZipWriter<File>,
@@ -136,13 +127,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	}
 
 	if match args.mod_build.to_lowercase().as_str() {
-		"false" => false,
-		"f" => false,
-		"no" => false,
-		"n" => false,
-		"none" => false,
+		"false" | "f" | "no" | "n" | "none" => false,
 		_ => true
-	} {bmod::build(mod_info)?}
+	} {bmod::build(&mod_info, args.mod_build.to_lowercase().as_str())?}
+	if match args.cpack_build.to_lowercase().as_str() {
+		"false" | "f" | "no" | "n" | "none" => false,
+		_ => true
+	} {bcpack::build(/*&mod_info, args.mod_build.to_lowercase().as_str()*/)?}
 	println!("{}", "[DONE] Finished execution !".green());
 	return Ok(());
 }
