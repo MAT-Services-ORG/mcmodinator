@@ -5,16 +5,23 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 	
 	let settings: serde_json::Value = serde_json::from_str(
 		&fs::read_to_string("pack.json").map_err(|error| {
-			let message = if error.kind() == io::ErrorKind::NotFound {
-				format!("\"pack.json\" not found in project")
+			let msg = if error.kind() == io::ErrorKind::NotFound {
+				"\"pack.json\" not found in project".to_string()
 			} else {
 				format!("Could not read \"pack.json\": {error}")
 			};
-			println!("{}", format!("[ERROR] {}", message).red());
-			io::Error::new(error.kind(), message)
-		})?
-	)?;
-	println!("{settings}");
+			println!("{}", format!("[ERROR] {}", msg).red());
+			io::Error::new(error.kind(), msg)
+		})? 
+	).map_err(|error| {
+		let msg = if error.classify() == serde_json::error::Category::Syntax {
+			"Cannot read \"pack.json\". Have you removed the comments?".to_string()
+		} else {
+			error.to_string()
+		};
+		println!("{}", format!("[ERROR] {}", msg).red());
+		io::Error::new(serde_json::Error::io_error_kind(&error).unwrap_or(io::ErrorKind::InvalidData), msg)
+	})?;
 
 	let expected_keys = [
 		"id",
@@ -46,11 +53,12 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			).into());
 		}
 	};
-	// Everithing that are here are dummies. There're not real working code.
-	//let settings: toml::Table = toml::from_str(&fs::read_to_string("settings.toml")?)?;
+	
 	Ok(ModInfo {
-		id: settings["modinator"]["id"].to_string(),
-		version: settings["modinator"]["mod_version"].to_string(),
+		id: settings["modinator"]["id"].as_str()
+			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "id must be a string"))?
+			.to_owned(),
+		version: settings["modinator"]["mod_version"].to_string(), // TODO: Verify if subquotes are problematic.
 		display_name: settings["modinator"]["display_name"].to_string(),
 		description: if settings["pack"]["description"].is_null() {String::new()} else {settings["pack"]["description"].to_string()},
 		authors: settings["modinator"]["authors"]
@@ -81,7 +89,14 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 					"pack.json: paths.icon must be a string",
 				);
 			})?),
-		paths: format!("assets = {}\ndata = {}\nicon = {}", settings["paths"]["assets"], settings["paths"]["data"], settings["paths"]["icon"]).parse::<Table>().unwrap()
+		paths: 
+			format!(
+				"assets = \"{}\"\ndata = \"{}\"\nicon = \"{}\"", 
+				if settings["paths"]["assets"].is_string() {settings["paths"]["assets"].as_str().unwrap()} else {""}, 
+				if settings["paths"]["data"].is_string() {settings["paths"]["data"].as_str().unwrap()} else {""}, 
+				if settings["paths"]["icon"].is_string() {settings["paths"]["icon"].as_str().unwrap()} else {""}
+			)
+			.parse::<Table>().unwrap() // TODO: Add unwrap_or error to avoid panicks.
 	})
 	/* PathsSettings will return:
 		assets = "assets/"
