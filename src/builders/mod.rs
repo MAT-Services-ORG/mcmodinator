@@ -61,7 +61,6 @@ description="{description}"
 		logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
 	).as_bytes())?;
 
-	// TODO: NeoForge MetaData (Unfinished)
 	zip.start_file("META-INF/neoforge.mods.toml", SimpleFileOptions::default())?;
 	zip.write_all(format!(
 r#"modLoader="lowcodefml"
@@ -134,7 +133,6 @@ description="{description}"
 						.downcast_ref::<io::Error>()
 						.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
 					{
-						
 						println!("{}", "[WARN] Datapack files not found at provided path.".yellow());
 					} else {
 						println!("{}", format!("[ERROR] {}", error).red());

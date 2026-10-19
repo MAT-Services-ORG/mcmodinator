@@ -76,7 +76,9 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			} else {
 				settings["pack"]["description"]
 					.as_str()
-					.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "description must be a string"))?
+					.ok_or_else(|| {
+						println!("{}", "[ERROR] Description must be a string.".red());
+						io::Error::new(io::ErrorKind::InvalidData, "description must be a string")})?
 					.to_owned()
 			},
 		authors: settings["modinator"]["authors"]
@@ -90,15 +92,18 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				author
 					.as_str()
 					.map(String::from)
-					.ok_or_else(||	{
-						println!("{}", format!("[ERROR] PACK.JSON: Each author in \"authors\" must be a string:\n     like: [\"author1\", \"author2\", etc...]").red());
+					.ok_or_else(|| {
+						println!("{}", format!("[ERROR] PACK.JSON: Each author in \"authors\" must be a string:\n	 like: [\"author1\", \"author2\", etc...]").red());
 						return io::Error::new(io::ErrorKind::InvalidData, "each author must be a string");
 					})
     		})
     		.collect::<Result<Vec<_>, _>>()?,
 		license: settings["modinator"]["license"]
 			.as_str()
-			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "license must be a string"))?
+			.ok_or_else(|| {
+				println!("{}", "[ERROR] License must be a string.");
+				io::Error::new(io::ErrorKind::InvalidData, "license must be a string")
+			})?
 			.to_owned(),
 		forge_version: if !settings["modinator"]["neoforge_version"].is_null() {
 		match &settings["modinator"]["forge_version"] {
