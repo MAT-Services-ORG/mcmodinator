@@ -42,7 +42,22 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		}
 	};
 	
-	if !settings["paths"]["kubeloader"].is_null() {println!("{}", "[WARN] KUBELOADER is not supported yet. Check in newer versions: https://github.com/MAT-Services-ORG/mcmodinator/releases".yellow())} // TODO: KUBELOADER support.
+	if !settings["paths"]["kubeloader"].is_null() { // TODO: KUBELOADER support.
+		println!(
+			"{}", 
+			"[WARN] KUBELOADER is not supported yet. Check in newer versions: https://github.com/MAT-Services-ORG/mcmodinator/releases".yellow()
+		)
+	} 
+	let paths: Table = ["assets", "data", "icon"]
+    .into_iter()
+    .map(|key| {
+        let value = settings["paths"][key].as_str().unwrap_or_default();
+        (
+            key.to_owned(),
+            toml::Value::String(value.to_owned()),
+        )
+    })
+    .collect();
 	Ok(ModInfo {
 		id: settings["modinator"]["id"]
 			.as_str()
@@ -85,7 +100,8 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			.as_str()
 			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "license must be a string"))?
 			.to_owned(),
-		forge_version: match &settings["modinator"]["forge_version"] {
+		forge_version: if !settings["modinator"]["neoforge_version"].is_null() {
+		match &settings["modinator"]["forge_version"] {
 			serde_json::Value::String(value) => value.clone(),
 			serde_json::Value::Number(value) if value.is_i64() || value.is_u64() => value.to_string(),
 			_ => {
@@ -95,6 +111,25 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 					"forge_version must be a string or integer",
 				).into());
 			}
+		}} else {
+			println!("{}", "[WARN] No \"forge_version\" specified. Considering \"\".");
+			String::new()
+		},
+		neoforge_version: if !settings["modinator"]["neoforge_version"].is_null() {
+			match &settings["modinator"]["neoforge_version"] {
+				serde_json::Value::String(value) => value.clone(),
+				serde_json::Value::Number(value) if value.is_i64() || value.is_u64() => value.to_string(),
+				_ => {
+					println!("{}", format!("[ERROR] \"neoforge_version\" must be a string or integer").red());
+					return Err(std::io::Error::new(
+						std::io::ErrorKind::InvalidData,
+						"neoforge_version must be a string or integer",
+					).into());
+				}
+			}
+		} else {
+			println!("{}", "[WARN] No \"neoforge_version\" specified. Considering \"\".");
+			String::new()
 		},
 		icon: PathBuf::from(settings["paths"]["icon"]
 			.as_str()
@@ -105,17 +140,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 					"pack.json: paths.icon must be a string",
 				);
 			})?),
-		paths: 
-			format!(
-				"assets = \"{}\"\ndata = \"{}\"\nicon = \"{}\"", 
-				if settings["paths"]["assets"].is_string() {settings["paths"]["assets"].as_str().unwrap()} else {""}, 
-				if settings["paths"]["data"].is_string() {settings["paths"]["data"].as_str().unwrap()} else {""}, 
-				if settings["paths"]["icon"].is_string() {settings["paths"]["icon"].as_str().unwrap()} else {""}
-			)
-			.parse::<Table>().map_err(|err| {
-				println!("{}", format!("[ERROR] {err}").red());
-				return io::Error::new(io::ErrorKind::InvalidData, err);
-			})?
+		paths
 	})
 	/* PathsSettings will return:
 		assets = "assets/"

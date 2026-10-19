@@ -4,7 +4,8 @@ The Modinator is a tool created to create Minecraft Mods using data and ressourc
 It's a CLI tool that uses common mods architectures to create "universal" mods.
 The original project was developed and archived by Tornato, at the name of [DatapackModinator](https://github.com/T0RNATO/datapackmodinator), originally writen in Python. This project is actually written in Rust and are in actual development on some new features, improvements and compatibility avancements.
 
-Due to the fact than this project stills in development, We advise you to download the [original project releases](https://github.com/T0RNATO/datapackmodinator/releases/latest) to have a working modinator while this one is in development. 
+> [!NOTE]
+> Due to the fact than this project stills in development.<br>We advise you to check the [original project releases](https://github.com/T0RNATO/datapackmodinator/releases/latest) to have a working modinator while this one is in development. 
 
 
 ## Configure
@@ -15,7 +16,8 @@ Due to the fact than this project stills in development, We advise you to downlo
 
 On the new version, configuring the mod is directly via the pack.json file: 
 > [!IMPORTANT]
-> Comments aren't supported, remove them before running the modinator.
+> Comments aren't supported, remove them before running the modinator. <br>
+> Check [pack.json](https://github.com/MAT-Services-ORG/mcmodinator/blob/main/pack.json) for the non-commented template.
 ```json
 { // WARNING: The comments will be considered as errors by serde_json. Do not use them in the final pack.mcmeta.
 	"pack": {
@@ -32,7 +34,8 @@ On the new version, configuring the mod is directly via the pack.json file:
 		"mod_version": "1.0.0",
 		"authors": ["Myself"],
 		"license": "MIT",
-		"forge_version": "47"
+		"forge_version": "47", // https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html are supported as strings for "forge_version" and "neoforge_version".
+		"neoforge_version": "47"
 	},
 	"paths": { // Values can be set to None for none.
 		"icon": "./icon.png",
@@ -46,3 +49,28 @@ On the new version, configuring the mod is directly via the pack.json file:
 	}
 }
 ``` 
+## Using command line
+```
+Usage: modinator [OPTIONS]
+
+Options:
+  -l, --legacy-parser  Uses legacy parsing system (Check https://github.com/T0RNATO/datapackmodinator/ for informations)
+  -d, --doc [<TOPIC>]  Print documentation
+  -h, --help           Print help
+  -V, --version        Print version
+
+Project Options:
+  -p, --project-path <FOLDER>  Define project path [default: .]
+  -o, --output-path <FOLDER>   Define output folder [default: .]
+
+Build Options:
+  -m, --mod-build <BOOL or FILENAME>    Set Mod output [default: <ID>-mod.jar]
+  -c, --cpack-build <BOOL or FILENAME>  Set ContentPack output [default: False (Set to "<ID>-CPack.jar" if True.)]
+```
+
+### Legacy parser `--legacy-parser`
+The Legacy Parser is a parser to compatibilize project created using [DatapackModinator](https://github.com/T0RNATO/datapackmodinator) wigout needing to change anything. It is possible than it does not include all the functionnalities and latest improvements. Considere updating to the new parsing system when possible.
+### Doccumentation `--doc`
+Shows the informations needed in the terminal. Can be helpful for offline mode. 
+<br>To access a specific topic in the doccumentation, type `modinator -d <TOPIC>`. 
+<br>The list of topics is aviable by writing `modinator -d LIST`.

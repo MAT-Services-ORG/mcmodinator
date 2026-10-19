@@ -21,14 +21,13 @@ use std::path::PathBuf;
 #[derive(Parser)] #[command(name = "MAT Modinator", version = env!("CARGO_PKG_VERSION"), about = "MAT Modinator\nCreate a mod using DATA, ASSETS and KubeJS standrad folders.", long_about = None)] struct Args {
 	// Start defining the CLI auto parser using CLAP. For more informations: https://crates.io/crates/clap
 
-	
 	/// Define project path
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER", help_heading = "Project Options")]
 	project_path: String,
 
 	/// Define output folder
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER", help_heading = "Project Options")]
-	output_path: String,
+	output_path: String, // TODO: Create a path specifier if not implented.
 
 	/// Set Mod output [default: <ID>-mod.jar]
 	#[arg(short, long, default_value_t = "True".to_string(), hide_default_value = true, value_name = "BOOL or FILENAME", help_heading = "Build Options")]
@@ -55,6 +54,7 @@ pub struct ModInfo {
     authors: Vec<String>,
     license: String,
     forge_version: String,
+	neoforge_version: String,
 	icon: PathBuf,
 	paths: toml::map::Map<String, toml::Value> 
 }
