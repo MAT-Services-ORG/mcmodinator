@@ -27,7 +27,7 @@ use std::path::PathBuf;
 
 	/// Define output folder
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER", help_heading = "Project Options")]
-	output_path: String,
+	output_path: String, // TODO: Create a path specifier if not implented.
 
 	/// Set Mod output [default: <ID>-mod.jar]
 	#[arg(short, long, default_value_t = "True".to_string(), hide_default_value = true, value_name = "BOOL or FILENAME", help_heading = "Build Options")]

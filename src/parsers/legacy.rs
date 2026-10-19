@@ -12,9 +12,10 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 		io::Error::new(error.kind(), message)
 	})?)?; // Use pack.json on the new parser.
 
-	let info = settings["mod_info"].as_table().unwrap();
+	let info = settings["mod_info"].as_table().unwrap(); // TOFIX: Add OK_OR_ELSE? instead of UNWRAP to avoid errors.
 	let paths = settings["paths"].as_table().unwrap();
 	println!("test: {}", settings["paths"].as_table().unwrap());
+	
 	// Check for missing keys
 	let expected_keys = [
 		"id",
@@ -23,38 +24,44 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 		"description",
 		"authors",
 		"license",
-		"forge_version",
+		"forge_version"
 	];
 
-	for key in info.keys() {
-		if !expected_keys.contains(&key.as_str()) {
+	for key in expected_keys {
+		if !info.contains_key(key) {
 			println!("{}", format!("[ERROR] Missing keys in settings: {}", key).red());
 			return Err(std::io::Error::new(
 				std::io::ErrorKind::InvalidData,
 				"Missing required key in settings",
 			)
 			.into());
-		}
+		};
 	};
 
-	println!("[DEBUG] ForgeInput:\n{}", info["forge_version"]);
 	let forge_version = match &info["forge_version"] {
 		toml::Value::String(value) => value.clone(),
 		toml::Value::Integer(value) => value.to_string(),
 		_ => {
+			println!("{}", "[ERROR] forge_version must be a string or integer".red());
 			return Err(std::io::Error::new(
 				std::io::ErrorKind::InvalidData,
 				"forge_version must be a string or integer",
 			).into());
 		}
 	};
-	println!("[DEBUG] PathsType:\n{}", paths.clone().to_string());
-	/* Returns:
-		[DEBUG] PathsType:
-		assets = "assets/"
-		data = "data/"
-		icon = "icon.png"
-	*/
+	let neoforge_version = match info.get("neoforge_version") {
+		Some(toml::Value::String(value)) => value.clone(),
+		Some(toml::Value::Integer(value)) => value.to_string(),
+		None => String::new(),
+		_ => {
+			println!("{}", "[ERROR] neoforge_version must be a string or integer".red());
+			return Err(std::io::Error::new(
+				std::io::ErrorKind::InvalidData,
+				"neoforge_version must be a string or integer",
+			)
+			.into());
+		}
+	};
 	Ok(ModInfo { 
 		id: info["id"].as_str()
 			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "id must be a string"))?
@@ -64,7 +71,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 		description: info["description"].as_str().unwrap().to_string(), 
 		license: info["license"].as_str().unwrap().to_string(),
 		forge_version,
-		neoforge_version: "".to_string(), // TODO: NeoSupport
+		neoforge_version,
 		authors: info["authors"]
 			.as_array()
 			.unwrap()

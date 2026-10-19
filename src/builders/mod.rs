@@ -173,7 +173,7 @@ description="{description}"
 
 
 	// Finish ZIP
-	zip.finish()?;
+	zip.finish()?; // TOFIX: If cannot execute, ex: error: process didn't exit successfully: `target\debug\modinator.exe` (exit code: 1)
 
 
 	println!("{}", format!("[DONE] Mod created at {modfilename}").green());
