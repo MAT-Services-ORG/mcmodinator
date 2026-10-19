@@ -47,13 +47,13 @@ use std::path::PathBuf;
 }
 
 pub struct ModInfo {
-    id: String,
-    version: String,
-    display_name: String,
-    description: String,
-    authors: Vec<String>,
-    license: String,
-    forge_version: String,
+	id: String,
+	version: String,
+	display_name: String,
+	description: String,
+	authors: Vec<String>,
+	license: String,
+	forge_version: String,
 	neoforge_version: String,
 	icon: PathBuf,
 	paths: toml::map::Map<String, toml::Value> 

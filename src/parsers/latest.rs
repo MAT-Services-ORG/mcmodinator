@@ -49,15 +49,15 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		)
 	} 
 	let paths: Table = ["assets", "data", "icon"]
-    .into_iter()
-    .map(|key| {
-        let value = settings["paths"][key].as_str().unwrap_or_default();
-        (
-            key.to_owned(),
-            toml::Value::String(value.to_owned()),
-        )
-    })
-    .collect();
+	.into_iter()
+	.map(|key| {
+		let value = settings["paths"][key].as_str().unwrap_or_default();
+		(
+			key.to_owned(),
+			toml::Value::String(value.to_owned()),
+		)
+	})
+	.collect();
 	Ok(ModInfo {
 		id: settings["modinator"]["id"]
 			.as_str()
@@ -82,20 +82,20 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		authors: settings["modinator"]["authors"]
 			.as_array()
 			.ok_or_else(|| {
-						println!("{}", format!("[ERROR] PACK.JSON: \"authors\" must be an array:\n     like: [\"author1\", \"author2\", etc...]").red());
+						println!("{}", format!("[ERROR] PACK.JSON: \"authors\" must be an array:\n	 like: [\"author1\", \"author2\", etc...]").red());
 						return io::Error::new(io::ErrorKind::InvalidData, "authors must be an array");
 					})?
-    		.iter()
+			.iter()
 			.map(|author| {
 				author
 					.as_str()
 					.map(String::from)
 					.ok_or_else(||	{
-						println!("{}", format!("[ERROR] PACK.JSON: Each author in \"authors\" must be a string:\n     like: [\"author1\", \"author2\", etc...]").red());
+						println!("{}", format!("[ERROR] PACK.JSON: Each author in \"authors\" must be a string:\n	 like: [\"author1\", \"author2\", etc...]").red());
 						return io::Error::new(io::ErrorKind::InvalidData, "each author must be a string");
 					})
-    		})
-    		.collect::<Result<Vec<_>, _>>()?,
+			})
+			.collect::<Result<Vec<_>, _>>()?,
 		license: settings["modinator"]["license"]
 			.as_str()
 			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "license must be a string"))?
