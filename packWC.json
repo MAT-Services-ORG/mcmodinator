@@ -13,7 +13,8 @@
 		"mod_version": "1.0.0",
 		"authors": ["Myself"],
 		"license": "MIT",
-		"forge_version": "47"
+		"forge_version": "47", // https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html are supported as strings for "forge_version" and "neoforge_version".
+		"neoforge_version": "1.20.1"
 	},
 	"paths": { // Values can be set to None for none.
 		"icon": "./icon.png",

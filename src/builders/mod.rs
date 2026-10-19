@@ -34,10 +34,12 @@ pub fn build(mod_info: &ModInfo, mod_build: &str) -> Result<(), Box<dyn std::err
 	zip.write_all(fabric_json.as_bytes())?;
 
 
-	// Forge
-	let forge_toml = format!(
-		r#"modLoader="lowcodefml"
-loaderVersion="[{forge_version},)"
+	// Forge MataData
+	zip.start_file("META-INF/mods.toml", SimpleFileOptions::default())?;
+	zip.write_all(format!(
+
+r#"modLoader="lowcodefml"
+loaderVersion="{forge_version}"
 
 license="{license}"
 
@@ -57,18 +59,34 @@ description="{description}"
 		authors = mod_info.authors.join(", "),
 		description = mod_info.description,
 		logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
-	);
+	).as_bytes())?;
 
+	// TODO: NeoForge MetaData (Unfinished)
+	zip.start_file("META-INF/neoforge.mods.toml", SimpleFileOptions::default())?;
+	zip.write_all(format!(
+r#"modLoader="lowcodefml"
+loaderVersion="{neo_version}" 
 
-	zip.start_file(
-		"META-INF/mods.toml",
-		SimpleFileOptions::default(),
-	)?;
+license="{license}"
 
-	zip.write_all(forge_toml.as_bytes())?;
+[[mods]]
+modId="{id}"
+version="{version}"
+displayName="{display_name}"
+authors="{authors}"
+description="{description}"
+{logo}
+"#,
+		neo_version = mod_info.neoforge_version,
+		license = mod_info.license,
+		id = mod_info.id,
+		version = mod_info.version,
+		display_name = mod_info.display_name,
+		authors = mod_info.authors.join(", "),
+		description = mod_info.description,
+		logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
+	).as_bytes())?;
 
-	// TODO: NeoForge
-	
 	// Icon
 	if let Some(icon_path) = mod_info.paths.get("icon").and_then(|x| x.as_str()) {
 		if !icon_path.is_empty() {
@@ -81,7 +99,7 @@ description="{description}"
 
 					zip.write_all(&data)?;
 
-					println!("Added icon");
+					println!("{}", "[INFO] Added icon".blue());
 				}
 				
 				Err(error) => {
@@ -99,7 +117,7 @@ description="{description}"
 	}
 
 
-	// Datapack
+	// Data
 	if let Some(data_path) = mod_info.paths.get("data").and_then(|x| x.as_str()) {
 		if !data_path.is_empty() {
 			match add_folder_to_zip(
@@ -108,7 +126,7 @@ description="{description}"
 				"data",
 			) {
 				Ok(count) => {
-					println!("Added {} datapack files", count);
+					println!("{}", format!("[INFO] Added {} datapack files", count).blue());
 				}
 
 				Err(error) => {
@@ -127,7 +145,7 @@ description="{description}"
 	}
 
 
-	// Resource pack
+	// Assets
 	if let Some(assets_path) = mod_info.paths.get("assets").and_then(|x| x.as_str()) {
 		if !assets_path.is_empty() {
 			match add_folder_to_zip(
@@ -136,7 +154,7 @@ description="{description}"
 				"assets",
 			) {
 				Ok(count) => {
-					println!("Added {} resource pack files", count);
+					println!("{}", format!("[INFO] Added {} resource pack files", count).blue());
 				}
 
 				Err(error) => {

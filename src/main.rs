@@ -54,6 +54,7 @@ pub struct ModInfo {
     authors: Vec<String>,
     license: String,
     forge_version: String,
+	neoforge_version: String,
 	icon: PathBuf,
 	paths: toml::map::Map<String, toml::Value> 
 }

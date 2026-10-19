@@ -42,7 +42,12 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		}
 	};
 	
-	if !settings["paths"]["kubeloader"].is_null() {println!("{}", "[WARN] KUBELOADER is not supported yet. Check in newer versions: https://github.com/MAT-Services-ORG/mcmodinator/releases".yellow())} // TODO: KUBELOADER support.
+	if !settings["paths"]["kubeloader"].is_null() { // TODO: KUBELOADER support.
+		println!(
+			"{}", 
+			"[WARN] KUBELOADER is not supported yet. Check in newer versions: https://github.com/MAT-Services-ORG/mcmodinator/releases".yellow()
+		)
+	} 
 	Ok(ModInfo {
 		id: settings["modinator"]["id"]
 			.as_str()
@@ -96,6 +101,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				).into());
 			}
 		},
+		neoforge_version: "".to_string(), // TODO: NeoSupport
 		icon: PathBuf::from(settings["paths"]["icon"]
 			.as_str()
 			.ok_or_else(|| {

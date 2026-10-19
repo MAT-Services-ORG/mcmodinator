@@ -64,6 +64,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 		description: info["description"].as_str().unwrap().to_string(), 
 		license: info["license"].as_str().unwrap().to_string(),
 		forge_version,
+		neoforge_version: "".to_string(), // TODO: NeoSupport
 		authors: info["authors"]
 			.as_array()
 			.unwrap()
