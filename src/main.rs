@@ -21,7 +21,6 @@ use std::path::PathBuf;
 #[derive(Parser)] #[command(name = "MAT Modinator", version = env!("CARGO_PKG_VERSION"), about = "MAT Modinator\nCreate a mod using DATA, ASSETS and KubeJS standrad folders.", long_about = None)] struct Args {
 	// Start defining the CLI auto parser using CLAP. For more informations: https://crates.io/crates/clap
 
-	
 	/// Define project path
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER", help_heading = "Project Options")]
 	project_path: String,
