@@ -5,7 +5,7 @@ It's a CLI tool that uses common mods architectures to create "universal" mods.
 The original project was developed and archived by Tornato, at the name of [DatapackModinator](https://github.com/T0RNATO/datapackmodinator), originally writen in Python. This project is actually written in Rust and are in actual development on some new features, improvements and compatibility avancements.
 
 > [!NOTE]
-> Due to the fact than this project stills in development.<br>We advise you to check the [original project releases](https://github.com/T0RNATO/datapackmodinator/releases/latest) to have a working modinator while this one is in development. 
+> Due to the fact than this project stills in development, we advise you to check the [original project releases](https://github.com/T0RNATO/datapackmodinator/releases/latest) to have a working modinator while this one is in development. 
 
 
 ## Configure
