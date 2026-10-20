@@ -6,7 +6,10 @@ pub fn build(mod_info: &ModInfo, mod_build: &str) -> Result<(), Box<dyn std::err
 		"true" | "t" | "yes" | "y" => format!("{}-mod.jar", mod_info.id),
 		_ => mod_build.to_string()
 	};
-	let file = File::create(&modfilename)?;
+	let file = File::create(&modfilename).map_err(|error| {
+		println!("{}", format!("[ERROR] {}", error.to_string()).red());
+		io::Error::new(error.kind(), error.to_string())
+	})?;
 	let mut zip = ZipWriter::new(file);
 	
 	// Fabric
@@ -171,8 +174,7 @@ description="{description}"
 
 
 	// Finish ZIP
-	zip.finish()?; // TOFIX: If cannot execute, ex: error: process didn't exit successfully: `target\debug\modinator.exe` (exit code: 1)
-
+	zip.finish()?;
 
 	println!("{}", format!("[DONE] Mod created at {modfilename}").green());
     Ok(())
