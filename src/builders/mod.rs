@@ -1,9 +1,9 @@
 use crate::*;
 
-pub fn build(mod_info: &ModInfo, mod_build: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result<(), Box<dyn std::error::Error>> {
 	println!("[INFO] Building file..."); // Create ZIP/JAR
 	let modfilename = match mod_build {
-		"true" | "t" | "yes" | "y" => format!("{}-mod.jar", mod_info.id),
+		"true" | "t" | "yes" | "y" => format!("{}/{}-mod.jar", output_path, mod_info.id),
 		_ => mod_build.to_string()
 	};
 	let file = File::create(&modfilename).map_err(|error| {
