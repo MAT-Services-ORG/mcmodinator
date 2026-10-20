@@ -22,7 +22,7 @@ On the new version, configuring the mod is directly via the pack.json file:
 { // WARNING: The comments will be considered as errors by serde_json. Do not use them in the final pack.mcmeta.
 	"pack": {
 		"description": "My custom pack",
-		"pack_format": 121, // For RP or DP ?
+		"pack_format": 121, // Formats have actually no uses... Potentially later ?
 		"supported_formats": {
 			"min_inclusive": 4,
 			"max_inclusive": 121

@@ -137,15 +137,17 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			println!("{}", "[WARN] PACK.JSON: No \"neoforge_version\" specified. Considering \"\".".yellow());
 			String::new()
 		},
-		icon: PathBuf::from(settings["paths"]["icon"]
-			.as_str()
-			.ok_or_else(|| {
-				println!("{}", format!("[ERROR] pack.json[\"paths\"][\"icon\"] must be a string.").red());
-				return io::Error::new(
-					io::ErrorKind::InvalidData,
-					"pack.json: paths.icon must be a string",
-				);
-			})?),
+		icon: PathBuf::from(if settings["paths"]["icon"].is_null() {""} else {
+			settings["paths"]["icon"]
+				.as_str()
+				.ok_or_else(|| {
+					println!("{}", format!("[ERROR] pack.json[\"paths\"][\"icon\"] must be a string.").red());
+					return io::Error::new(
+						io::ErrorKind::InvalidData,
+						"pack.json: paths.icon must be a string",
+					);
+				})?
+			}),
 		paths
 	})
 	/* PathsSettings will return:
