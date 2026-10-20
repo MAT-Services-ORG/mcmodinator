@@ -137,3 +137,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	println!("{}", "[DONE] Finished execution !".green());
 	return Ok(());
 }
+
+/* TODO:
+	- Dependencies
+		Forge: 
+			[[dependencies.confluencerechiseled]]
+			    modId="minecraft"
+				type="required"
+				# This version range declares a minimum of the current minecraft version up to but not including the next major version
+				versionRange="[1.21.1]"
+				ordering="NONE"
+				side="BOTH"
+		Fabric: ???
+*/

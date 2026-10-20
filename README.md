@@ -33,8 +33,8 @@ On the new version, configuring the mod is directly via the pack.json file:
 		"mod_version": "1.0.0",
 		"authors": ["Myself"],
 		"license": "MIT",
-		"forge_version": "47", // https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html are supported as strings for "forge_version" and "neoforge_version".
-		"neoforge_version": "47"
+		"forge_version": "[1,)", // https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html are supported as strings for "forge_version" and "neoforge_version". You can also use integers when exact versions.
+		"neoforge_version": "[1,)"
 	},
 	"paths": { // Values can be set to None for none.
 		"icon": "./icon.png",

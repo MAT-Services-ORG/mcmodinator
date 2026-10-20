@@ -14,7 +14,7 @@ license = "MIT"
 # Forge loader version, because forge can't just support MC version numbers.
 # For reference, 40 is 1.18, 43 is 1.19.2, and 47 is 1.20.1
 # I will assume it supports versions newer than this as well.
-forge_version = 47
+forge_version = "[1,)"
 
 # Paths are from the directory from which this is run. These keys are optional.
 [paths]
