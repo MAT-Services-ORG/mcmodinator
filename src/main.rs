@@ -27,7 +27,7 @@ use std::path::PathBuf;
 
 	/// Define output folder
 	#[arg(short, long, default_value_t = ".".to_string(), value_name = "FOLDER", help_heading = "Project Options")]
-	output_path: String, // TODO: Create a path specifier if not implented.
+	output_path: String,
 
 	/// Set Mod output [default: <ID>-mod.jar]
 	#[arg(short, long, default_value_t = "True".to_string(), hide_default_value = true, value_name = "BOOL or FILENAME", help_heading = "Build Options")]
@@ -104,7 +104,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	match args.doc.as_deref() {
 		None => {}
 		Some("MAIN") => {doc::doc("MAIN"); return Ok(())}
-		Some(topic) => {doc::doc(topic); return Ok(())}
+		Some(topic) => {doc::doc(topic.to_ascii_uppercase().as_str()); return Ok(())}
 	}
 
 	// Summurizing and applying values
@@ -129,11 +129,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	if match args.mod_build.to_lowercase().as_str() {
 		"false" | "f" | "no" | "n" | "none" => false,
 		_ => true
-	} {bmod::build(&mod_info, args.mod_build.to_lowercase().as_str())?}
+	} {bmod::build(&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path)?}
 	if match args.cpack_build.to_lowercase().as_str() {
 		"false" | "f" | "no" | "n" | "none" => false,
 		_ => true
-	} {bcpack::build(/*&mod_info, args.mod_build.to_lowercase().as_str()*/)?}
+	} {bcpack::build(/*&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path*/)?}
 	println!("{}", "[DONE] Finished execution !".green());
 	return Ok(());
 }
