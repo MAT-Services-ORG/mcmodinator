@@ -12,9 +12,19 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 		io::Error::new(error.kind(), message)
 	})?)?; // Use pack.json on the new parser.
 
-	let info = settings["mod_info"].as_table().unwrap(); // TOFIX: Add OK_OR_ELSE? instead of UNWRAP to avoid errors.
-	let paths = settings["paths"].as_table().unwrap();
-	println!("test: {}", settings["paths"].as_table().unwrap());
+	let info = settings["mod_info"]
+		.as_table()
+		.ok_or_else(|| {
+			println!("{}", "[ERROR] Cannot parse [mod_info]. Check if your syntax is valid.".red());
+			return io::Error::new(io::ErrorKind::InvalidData, "cannot parse [mod_info] in settings.toml")
+		})
+		.unwrap(); 
+	let paths = settings["paths"]
+		.as_table()
+		.ok_or_else(|| {
+			println!("{}", "[ERROR] Cannot parse [paths]. Check if your syntax is valid.".red())
+		})
+		.unwrap();
 	
 	// Check for missing keys
 	let expected_keys = [
@@ -38,46 +48,82 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 		};
 	};
 
-	let forge_version = match &info["forge_version"] {
-		toml::Value::String(value) => value.clone(),
-		toml::Value::Integer(value) => value.to_string(),
-		_ => {
-			println!("{}", "[ERROR] forge_version must be a string or integer".red());
-			return Err(std::io::Error::new(
-				std::io::ErrorKind::InvalidData,
-				"forge_version must be a string or integer",
-			).into());
-		}
-	};
-	let neoforge_version = match info.get("neoforge_version") {
-		Some(toml::Value::String(value)) => value.clone(),
-		Some(toml::Value::Integer(value)) => value.to_string(),
-		None => String::new(),
-		_ => {
-			println!("{}", "[ERROR] neoforge_version must be a string or integer".red());
-			return Err(std::io::Error::new(
-				std::io::ErrorKind::InvalidData,
-				"neoforge_version must be a string or integer",
-			)
-			.into());
-		}
-	};
-	Ok(ModInfo { 
+	Ok(ModInfo {
 		id: info["id"].as_str()
-			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "id must be a string"))?
+			.ok_or_else(|| {
+				println!("{}", "[ERROR] id must be a string".red());
+				return io::Error::new(io::ErrorKind::InvalidData, "id must be a string")
+			})?
 			.to_owned(), 
-		version: info["version"].as_str().unwrap().to_string(), 
-		display_name: info["display_name"].as_str().unwrap().to_string(), 
-		description: info["description"].as_str().unwrap().to_string(), 
-		license: info["license"].as_str().unwrap().to_string(),
-		forge_version,
-		neoforge_version,
+		version: info["version"]
+			.as_str()
+			.ok_or_else(|| {
+				println!("{}", "[ERROR] version must be a string or integer".red());
+				return  io::Error::new(io::ErrorKind::InvalidData, "version must be a string or integer");
+			})?
+			.to_string(), 
+		display_name: info["display_name"]
+			.as_str()
+			.ok_or_else(|| {
+				println!("{}", "[ERROR] display_name must be a string".red());
+				return  io::Error::new(io::ErrorKind::InvalidData, "display_name must be a string");
+			})?
+			.to_string(), 
+		description: info["description"]
+			.as_str()
+			.ok_or_else(|| {
+				println!("{}", "[ERROR] description must be a string".red());
+				return  io::Error::new(io::ErrorKind::InvalidData, "description must be a string");
+			})?
+			.to_string(), 
+		license: info["license"]
+			.as_str()
+			.ok_or_else(|| {
+				println!("{}", "[ERROR] license must be a string".red());
+				return  io::Error::new(io::ErrorKind::InvalidData, "license must be a string");
+			})?
+			.to_string(),
+		forge_version: match &info["forge_version"] {
+			toml::Value::String(value) => value.clone(),
+			toml::Value::Integer(value) => value.to_string(),
+			_ => {
+				println!("{}", "[ERROR] forge_version must be a string or integer".red());
+				return Err(std::io::Error::new(
+					std::io::ErrorKind::InvalidData,
+					"forge_version must be a string or integer",
+				).into());
+			}
+		},
+		neoforge_version: match info.get("neoforge_version") {
+			Some(toml::Value::String(value)) => value.clone(),
+			Some(toml::Value::Integer(value)) => value.to_string(),
+			None => String::new(),
+			_ => {
+				println!("{}", "[ERROR] neoforge_version must be a string or integer".red());
+				return Err(std::io::Error::new(
+					std::io::ErrorKind::InvalidData,
+					"neoforge_version must be a string or integer",
+				)
+				.into());
+			}
+		},
 		authors: info["authors"]
 			.as_array()
-			.unwrap()
+			.ok_or_else(||{
+				println!("{}", "[ERROR] authors must be an array".red());
+				return  io::Error::new(io::ErrorKind::InvalidData, "authors must be an array");
+			})?
 			.iter()
-			.map(|author| author.as_str().unwrap().to_string())
-			.collect(),
+			.map(|author| 
+				author
+					.as_str()
+					.ok_or_else(|| {
+						println!("{}", "[ERROR] each author in authors must be a string".red());
+						return  io::Error::new(io::ErrorKind::InvalidData, "not a string in authors = [String]");
+					})
+				.map(str::to_owned)
+			)
+			.collect::<Result<Vec<_>, io::Error>>()?,
 		icon: PathBuf::from(paths["icon"].as_str()
 			.ok_or_else(|| {
 				println!("{}", format!("[ERROR] settings.toml[\"paths\"][\"icon\"] must be a string.").red());

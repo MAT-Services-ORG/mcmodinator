@@ -13,14 +13,14 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			println!("{}", format!("[ERROR] {}", msg).red());
 			io::Error::new(err.kind(), msg)
 		})? 
-	).map_err(|error| {
-		let msg = if error.classify() == serde_json::error::Category::Syntax {
+	).map_err(|err| {
+		let msg = if err.classify() == serde_json::error::Category::Syntax {
 			"Cannot read \"pack.json\". Have you removed the comments?".to_string()
 		} else {
-			error.to_string()
+			err.to_string()
 		};
 		println!("{}", format!("[ERROR] {}", msg).red());
-		io::Error::new(serde_json::Error::io_error_kind(&error).unwrap_or(io::ErrorKind::InvalidData), msg)
+		io::Error::new(serde_json::Error::io_error_kind(&err).unwrap_or(io::ErrorKind::InvalidData), msg)
 	})?;
 
 	let expected_keys = [
@@ -76,7 +76,9 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			} else {
 				settings["pack"]["description"]
 					.as_str()
-					.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "description must be a string"))?
+					.ok_or_else(|| {
+						println!("{}", "[ERROR] Description must be a string.".red());
+						io::Error::new(io::ErrorKind::InvalidData, "description must be a string")})?
 					.to_owned()
 			},
 		authors: settings["modinator"]["authors"]
@@ -90,7 +92,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				author
 					.as_str()
 					.map(String::from)
-					.ok_or_else(||	{
+					.ok_or_else(|| {
 						println!("{}", format!("[ERROR] PACK.JSON: Each author in \"authors\" must be a string:\n	 like: [\"author1\", \"author2\", etc...]").red());
 						return io::Error::new(io::ErrorKind::InvalidData, "each author must be a string");
 					})
@@ -98,21 +100,25 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			.collect::<Result<Vec<_>, _>>()?,
 		license: settings["modinator"]["license"]
 			.as_str()
-			.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "license must be a string"))?
+			.ok_or_else(|| {
+				println!("{}", "[ERROR] License must be a string.");
+				io::Error::new(io::ErrorKind::InvalidData, "license must be a string")
+			})?
 			.to_owned(),
-		forge_version: if !settings["modinator"]["neoforge_version"].is_null() {
-		match &settings["modinator"]["forge_version"] {
-			serde_json::Value::String(value) => value.clone(),
-			serde_json::Value::Number(value) if value.is_i64() || value.is_u64() => value.to_string(),
-			_ => {
-				println!("{}", format!("[ERROR] \"forge_version\" must be a string or integer").red());
-				return Err(std::io::Error::new(
-					std::io::ErrorKind::InvalidData,
-					"forge_version must be a string or integer",
-				).into());
+		forge_version: if !settings["modinator"]["forge_version"].is_null() {
+			match &settings["modinator"]["forge_version"] {
+				serde_json::Value::String(value) => value.clone(),
+				serde_json::Value::Number(value) if value.is_i64() || value.is_u64() => value.to_string(),
+				_ => {
+					println!("{}", format!("[ERROR] \"forge_version\" must be a string or integer").red());
+					return Err(std::io::Error::new(
+						std::io::ErrorKind::InvalidData,
+						"forge_version must be a string or integer",
+					).into());
+				}
 			}
-		}} else {
-			println!("{}", "[WARN] No \"forge_version\" specified. Considering \"\".");
+		} else {
+			println!("{}", "[WARN] PACK.JSON: No \"forge_version\" specified. Considering \"\".".yellow());
 			String::new()
 		},
 		neoforge_version: if !settings["modinator"]["neoforge_version"].is_null() {
@@ -128,18 +134,20 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				}
 			}
 		} else {
-			println!("{}", "[WARN] No \"neoforge_version\" specified. Considering \"\".");
+			println!("{}", "[WARN] PACK.JSON: No \"neoforge_version\" specified. Considering \"\".".yellow());
 			String::new()
 		},
-		icon: PathBuf::from(settings["paths"]["icon"]
-			.as_str()
-			.ok_or_else(|| {
-				println!("{}", format!("[ERROR] pack.json[\"paths\"][\"icon\"] must be a string.").red());
-				return io::Error::new(
-					io::ErrorKind::InvalidData,
-					"pack.json: paths.icon must be a string",
-				);
-			})?),
+		icon: PathBuf::from(if settings["paths"]["icon"].is_null() {""} else {
+			settings["paths"]["icon"]
+				.as_str()
+				.ok_or_else(|| {
+					println!("{}", format!("[ERROR] pack.json[\"paths\"][\"icon\"] must be a string.").red());
+					return io::Error::new(
+						io::ErrorKind::InvalidData,
+						"pack.json: paths.icon must be a string",
+					);
+				})?
+			}),
 		paths
 	})
 	/* PathsSettings will return:
