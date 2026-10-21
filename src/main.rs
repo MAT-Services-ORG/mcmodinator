@@ -65,8 +65,7 @@ fn add_folder_to_zip(
 	let mut count = 0;
 
 	for entry in fs::read_dir(folder_path)? {
-		let entry = entry?;
-		let path = entry.path();
+		let path = entry?.path();
 
 		if path.is_dir() {
 			let relative = path.strip_prefix(folder_path)?;
@@ -77,16 +76,10 @@ fn add_folder_to_zip(
 				&path,
 				sub_arcname.to_str().unwrap(),
 			)?;
+			
 		} else if path.is_file() {
-			let relative = path.strip_prefix(folder_path)?;
-			let archive_path = Path::new(arcname).join(relative);
-
-			let archive_path = archive_path.to_str().unwrap();
-
-			zip.start_file(archive_path, SimpleFileOptions::default())?;
-
-			let mut file = File::open(&path)?;
-			io::copy(&mut file, zip)?;
+			zip.start_file(Path::new(arcname).join(path.strip_prefix(folder_path)?).to_str().unwrap(), SimpleFileOptions::default())?;
+			io::copy(&mut File::open(&path)?, zip)?;
 
 			count += 1;
 		}

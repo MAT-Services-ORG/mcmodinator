@@ -1,5 +1,36 @@
 use crate::*;
 
+fn import_folder(
+	given_path: Option<&serde_json::value::Value>,
+	zip: &mut ZipWriter<File>,
+	output_name: &str,
+	output_type: &str
+) -> Result<(), Box<dyn std::error::Error>> {
+	if let Some(path) = given_path.and_then(|x| x.as_str()) {
+		if !path.is_empty() {
+			match add_folder_to_zip(
+				zip,
+				Path::new(path),
+				output_type,
+			) {
+				Ok(count) => {
+					println!("{}", format!("[INFO] Added {count} {output_name}").blue());
+				}
+				Err(error) => {
+					if error
+						.downcast_ref::<io::Error>()
+						.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
+					{
+						println!("{}", format!("[WARN] {output_name} not found at provided path.").yellow());
+					} else {
+						println!("{}", format!("[ERROR] {error}").red());
+					}
+				}
+			}
+		}
+	}
+	Ok(())
+}
 pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result<(), Box<dyn std::error::Error>> {
 	println!("[INFO] Building file..."); // Create ZIP/JAR
 	let modfilename = match mod_build {
@@ -120,59 +151,12 @@ description="{description}"
 
 
 	// Data
-	if let Some(data_path) = mod_info.paths.get("data").and_then(|x| x.as_str()) {
-		if !data_path.is_empty() {
-			match add_folder_to_zip(
-				&mut zip,
-				Path::new(data_path),
-				"data",
-			) {
-				Ok(count) => {
-					println!("{}", format!("[INFO] Added {} datapack files", count).blue());
-				}
-
-				Err(error) => {
-					if error
-						.downcast_ref::<io::Error>()
-						.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
-					{
-						println!("{}", "[WARN] Datapack files not found at provided path.".yellow());
-					} else {
-						println!("{}", format!("[ERROR] {}", error).red());
-					}
-				}
-			}
-		}
-	}
-
+	import_folder(mod_info.paths.get("data"), &mut zip, "Datapack Files", "data")?;
 
 	// Assets
-	if let Some(assets_path) = mod_info.paths.get("assets").and_then(|x| x.as_str()) {
-		if !assets_path.is_empty() {
-			match add_folder_to_zip(
-				&mut zip,
-				Path::new(assets_path),
-				"assets",
-			) {
-				Ok(count) => {
-					println!("{}", format!("[INFO] Added {} resource pack files", count).blue());
-				}
+	import_folder(mod_info.paths.get("assets"), &mut zip, "Resourcepack Files", "assets")?;
 
-				Err(error) => {
-					if error
-						.downcast_ref::<io::Error>()
-						.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
-					{
-						println!("{}", "[WARN] Resource pack files not found at provided path.".yellow());
-					} else {
-						println!("{}", format!("[ERROR] {}", error).red());
-					}
-				}
-			}
-		}
-	}
-
-	if !mod_info.paths["kubeloader"].is_null() { // TODO: KUBELOADER support.
+	if !mod_info.paths["kubeloader"].is_null() { 
 		print!(
 			"{}",
 			format!(
@@ -185,9 +169,13 @@ description="{description}"
 		let mut input = String::new();
 		io::stdin().read_line(&mut input)?;
 		if input.trim().eq_ignore_ascii_case("y") {
-			println!("{}","       ┃ Loading KubeLoader integrations at your risk.\n       ╹".bright_red())
+			println!("{}","       ┃ Loading KubeLoader integrations at your risk.\n       ╹".bright_red());
+			import_folder(mod_info.paths["kubeloader"].get("server-js"), &mut zip, "Server Scripts", "server_scripts")?; // server-js
+			import_folder(mod_info.paths["kubeloader"].get("client-js"), &mut zip, "Client Scripts", "client_scripts")?; // client-js
+			import_folder(mod_info.paths["kubeloader"].get("startup-js"), &mut zip, "Startup Scripts", "startup_scripts")?; // startup-js
+			// TODO: Generate KUBELOADER metadatas.
 		} else {
-			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow())
+			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow());
 		};
 	} 
 
