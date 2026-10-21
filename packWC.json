@@ -20,7 +20,7 @@
 		"icon": "./icon.png",
 		"assets": "./assets/",
 		"data": "./data/",
-		"kubeloader": { // Will require contentpacks.json.
+		"kubeloader": { // // Require KubeLoader
 			"server-js": "./server_scripts/",
 			"client-js": "./client_scripts/",
 			"startup-js": "./startup_scripts/"

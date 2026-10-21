@@ -1,4 +1,4 @@
-{ // Exemple took from https://github.com/WhiseNT/kubeloader_wiki-en/wiki/Content-Packs. Do not use in 
+{ // Exemple took from https://github.com/WhiseNT/kubeloader_wiki-en/wiki/Content-Packs. It looks like it can be automatically generated from the pack.json
   "id": "example-pack",
   "name": "Example Content Pack",
   "description": "An example content pack demonstrating metadata format",

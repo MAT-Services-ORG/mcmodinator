@@ -1,7 +1,7 @@
 use crate::*;
 
 pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
-	println!("[DEBUG] Parsing project archicture...");
+	println!("[DBUG] Parsing project archicture...");
 	
 	let settings: serde_json::Value = serde_json::from_str(
 		&fs::read_to_string("pack.json").map_err(|err| {
@@ -43,20 +43,33 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 	};
 	
 	if !settings["paths"]["kubeloader"].is_null() { // TODO: KUBELOADER support.
-		println!(
-			"{}", 
-			"[WARN] KUBELOADER is not supported yet. Check in newer versions: https://github.com/MAT-Services-ORG/mcmodinator/releases".yellow()
-		)
+		print!(
+			"{}",
+			format!(
+				"[CAUT] KUBELOADER technology is unfinished, problems can heppends if you chosse to continue.\n       ┃ We advise you to check if a relase is aviable: https://github.com/MAT-Services-ORG/mcmodinator/releases\n       ┃ Actual version: {}\n       ┃ Continue with KL integrations? [y/N]\n       ┣━╸ ",
+				env!("CARGO_PKG_VERSION")
+			)
+			.bright_red()
+		);
+		io::stdout().flush()?;
+		let mut input = String::new();
+		io::stdin().read_line(&mut input)?;
+		if input.trim().eq_ignore_ascii_case("y") {
+			println!("{}","       ┃ Loading KubeLoader integrations at your risk.\n       ╹".bright_red())
+		} else {
+			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow())
+		};
 	} 
-	let paths: Table = ["assets", "data", "icon"]
-	.into_iter()
-	.map(|key| {
-		let value = settings["paths"][key].as_str().unwrap_or_default();
-		(
-			key.to_owned(),
-			toml::Value::String(value.to_owned()),
-		)
-	})
+	let paths: Table = ["assets", "data", "icon"] // TODO: Add the KL integrations.
+		.into_iter()
+		.map(|key| {
+			let value = settings["paths"][key].as_str().unwrap_or_default();
+			(
+				key.to_owned(),
+				toml::Value::String(value.to_owned()),
+			)
+		}
+	)	
 	.collect();
 	Ok(ModInfo {
 		id: settings["modinator"]["id"]
@@ -137,17 +150,19 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			println!("{}", "[WARN] PACK.JSON: No \"neoforge_version\" specified. Considering \"\".".yellow());
 			String::new()
 		},
-		icon: PathBuf::from(if settings["paths"]["icon"].is_null() {""} else {
-			settings["paths"]["icon"]
-				.as_str()
-				.ok_or_else(|| {
-					println!("{}", format!("[ERROR] pack.json[\"paths\"][\"icon\"] must be a string.").red());
-					return io::Error::new(
-						io::ErrorKind::InvalidData,
-						"pack.json: paths.icon must be a string",
-					);
-				})?
-			}),
+		icon: PathBuf::from(
+			if settings["paths"]["icon"].is_null() {""} else {
+				settings["paths"]["icon"]
+					.as_str()
+					.ok_or_else(|| {
+						println!("{}", format!("[ERROR] pack.json[\"paths\"][\"icon\"] must be a string.").red());
+						return io::Error::new(
+							io::ErrorKind::InvalidData,
+							"pack.json: paths.icon must be a string",
+						);
+					})?
+				}
+			),
 		paths
 	})
 	/* PathsSettings will return:

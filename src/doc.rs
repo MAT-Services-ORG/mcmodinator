@@ -17,7 +17,7 @@ pub fn doc(topic: &str) {
 			"Shows a list of all topics",
 			format!("{}", "List of topics:".underline().bold())
 		]
-	});
+	}); // TODO: Add topics.
 
 	if topics[topic].is_null() {
 		println!("Topic does not exists.\nTry '{}' to see topics.", "modinator --doc LIST".bold())
