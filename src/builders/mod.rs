@@ -164,9 +164,9 @@ description="{description}"
 		io::stdin().read_line(&mut input)?;
 		if input.trim().eq_ignore_ascii_case("y") {
 			println!("{}","       ┃ Loading KubeLoader integrations at your risk.\n       ╹".bright_red());
-			import_folder(mod_info.paths["kubeloader"].get("server-js"), &mut zip, "Server Scripts", "server_scripts")?; // server-js
-			import_folder(mod_info.paths["kubeloader"].get("client-js"), &mut zip, "Client Scripts", "client_scripts")?; // client-js
-			import_folder(mod_info.paths["kubeloader"].get("startup-js"), &mut zip, "Startup Scripts", "startup_scripts")?; // startup-js
+			import_folder(mod_info.paths["kubeloader"].get("server-js"), &mut zip, "Server Scripts", "contentpacks/server_scripts")?; // server-js
+			import_folder(mod_info.paths["kubeloader"].get("client-js"), &mut zip, "Client Scripts", "contentpacks/client_scripts")?; // client-js
+			import_folder(mod_info.paths["kubeloader"].get("startup-js"), &mut zip, "Startup Scripts", "contentpacks/startup_scripts")?; // startup-js
 			// TODO: Generate KUBELOADER metadatas.
 		} else {
 			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow());
