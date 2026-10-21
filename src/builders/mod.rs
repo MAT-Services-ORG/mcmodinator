@@ -167,7 +167,7 @@ description="{description}"
 			import_folder(mod_info.paths["kubeloader"].get("server-js"), &mut zip, "Server Scripts", "contentpacks/server_scripts")?; // server-js
 			import_folder(mod_info.paths["kubeloader"].get("client-js"), &mut zip, "Client Scripts", "contentpacks/client_scripts")?; // client-js
 			import_folder(mod_info.paths["kubeloader"].get("startup-js"), &mut zip, "Startup Scripts", "contentpacks/startup_scripts")?; // startup-js
-			// TODO: Generate KUBELOADER metadatas.
+			// TODO: Generate KUBELOADER metadatas. (Check https://github.com/WhiseNT/kubeloader_wiki-en/wiki/Content-Packs )
 		} else {
 			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow());
 		};
