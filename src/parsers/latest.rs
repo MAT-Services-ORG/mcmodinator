@@ -41,36 +41,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			).into());
 		}
 	};
-	
-	if !settings["paths"]["kubeloader"].is_null() { // TODO: KUBELOADER support.
-		print!(
-			"{}",
-			format!(
-				"[CAUT] KUBELOADER technology is unfinished, problems can heppends if you chosse to continue.\n       ┃ We advise you to check if a relase is aviable: https://github.com/MAT-Services-ORG/mcmodinator/releases\n       ┃ Actual version: {}\n       ┃ Continue with KL integrations? [y/N]\n       ┣━╸ ",
-				env!("CARGO_PKG_VERSION")
-			)
-			.bright_red()
-		);
-		io::stdout().flush()?;
-		let mut input = String::new();
-		io::stdin().read_line(&mut input)?;
-		if input.trim().eq_ignore_ascii_case("y") {
-			println!("{}","       ┃ Loading KubeLoader integrations at your risk.\n       ╹".bright_red())
-		} else {
-			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow())
-		};
-	} 
-	let paths: Table = ["assets", "data", "icon"] // TODO: Add the KL integrations.
-		.into_iter()
-		.map(|key| {
-			let value = settings["paths"][key].as_str().unwrap_or_default();
-			(
-				key.to_owned(),
-				toml::Value::String(value.to_owned()),
-			)
-		}
-	)	
-	.collect();
+
 	Ok(ModInfo {
 		id: settings["modinator"]["id"]
 			.as_str()
@@ -163,7 +134,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 					})?
 				}
 			),
-		paths
+		paths: settings["paths"].clone()
 	})
 	/* PathsSettings will return:
 		assets = "assets/"

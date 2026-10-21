@@ -19,13 +19,12 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 			return io::Error::new(io::ErrorKind::InvalidData, "cannot parse [mod_info] in settings.toml")
 		})
 		.unwrap(); 
-	let paths = settings["paths"]
-		.as_table()
-		.ok_or_else(|| {
-			println!("{}", "[ERROR] Cannot parse [paths]. Check if your syntax is valid.".red())
-		})
-		.unwrap();
-	
+	let paths: serde_json::Value = json!({
+		"assets": settings["paths"]["assets"],
+		"data": settings["paths"]["data"],
+		"icon": settings["paths"]["icon"]
+	});
+
 	// Check for missing keys
 	let expected_keys = [
 		"id",
@@ -132,6 +131,6 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 					"settings.toml: paths.icon must be a string",
 				);
 			})?),
-		paths: paths.clone()
+		paths//: paths.clone()
 	})
 }

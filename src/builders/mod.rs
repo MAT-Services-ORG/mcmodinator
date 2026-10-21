@@ -24,7 +24,7 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 	});
 
 	if mod_info.icon.is_file() {
-		fabric["icon"] = Value::String(mod_info.icon.to_str().unwrap().to_string());
+		fabric["icon"] = serde_json::Value::String(mod_info.icon.to_str().unwrap().to_string());
 	}
 
 	let fabric_json = serde_json::to_string(&fabric)?;
@@ -172,6 +172,24 @@ description="{description}"
 		}
 	}
 
+	if !mod_info.paths["kubeloader"].is_null() { // TODO: KUBELOADER support.
+		print!(
+			"{}",
+			format!(
+				"[CAUT] KUBELOADER technology is unfinished, problems can heppends if you chosse to continue.\n       ┃ We advise you to check if a relase is aviable: https://github.com/MAT-Services-ORG/mcmodinator/releases\n       ┃ Actual version: {}\n       ┃ Continue with KL integrations? [y/N]\n       ┣━╸ ",
+				env!("CARGO_PKG_VERSION")
+			)
+			.bright_red()
+		);
+		io::stdout().flush()?;
+		let mut input = String::new();
+		io::stdin().read_line(&mut input)?;
+		if input.trim().eq_ignore_ascii_case("y") {
+			println!("{}","       ┃ Loading KubeLoader integrations at your risk.\n       ╹".bright_red())
+		} else {
+			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow())
+		};
+	} 
 
 	// Finish ZIP
 	zip.finish()?;

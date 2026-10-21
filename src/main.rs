@@ -1,15 +1,13 @@
 // This project is an hanced Rust equivalent of https://github.com/T0RNATO/datapackmodinator/ script.
 // Voir les informations sur le fichier externe pour le tas d'amélioration et d'oublis restants.
-use serde_json::{Value, json};
-use std::fs::{self, File, /*exists*/};
+use serde_json::json;
+use std::fs::{self, File};
 use std::io::{self, Write};
 use std::path::Path;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
-//use std::env::{self, args};
 use clap::Parser;
 use colored::Colorize;
-use toml::Table;
 use std::path::PathBuf;
 
 #[path = "parsers/legacy.rs"] mod plegacy;
@@ -56,7 +54,7 @@ pub struct ModInfo {
 	forge_version: String,
 	neoforge_version: String,
 	icon: PathBuf,
-	paths: toml::map::Map<String, toml::Value> 
+	paths: serde_json::Value
 }
 
 fn add_folder_to_zip(
