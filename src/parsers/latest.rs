@@ -68,8 +68,8 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		authors: settings["modinator"]["authors"]
 			.as_array()
 			.ok_or_else(|| {
-						println!("{}", format!("[ERROR] PACK.JSON: \"authors\" must be an array:\n	 like: [\"author1\", \"author2\", etc...]").red());
-						return io::Error::new(io::ErrorKind::InvalidData, "authors must be an array");
+						println!("{}", "[ERROR] PACK.JSON: \"authors\" must be an array:\n	 like: [\"author1\", \"author2\", etc...]".red());
+						io::Error::new(io::ErrorKind::InvalidData, "authors must be an array")
 					})?
 			.iter()
 			.map(|author| {
@@ -77,15 +77,15 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 					.as_str()
 					.map(String::from)
 					.ok_or_else(|| {
-						println!("{}", format!("[ERROR] PACK.JSON: Each author in \"authors\" must be a string:\n	 like: [\"author1\", \"author2\", etc...]").red());
-						return io::Error::new(io::ErrorKind::InvalidData, "each author must be a string");
+						println!("{}", "[ERROR] PACK.JSON: Each author in \"authors\" must be a string:\n	 like: [\"author1\", \"author2\", etc...]".red());
+						io::Error::new(io::ErrorKind::InvalidData, "each author must be a string")
 					})
 			})
 			.collect::<Result<Vec<_>, _>>()?,
 		license: settings["modinator"]["license"]
 			.as_str()
 			.ok_or_else(|| {
-				println!("{}", "[ERROR] License must be a string.");
+				println!("[ERROR] License must be a string.");
 				io::Error::new(io::ErrorKind::InvalidData, "license must be a string")
 			})?
 			.to_owned(),
@@ -94,7 +94,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				serde_json::Value::String(value) => value.clone(),
 				serde_json::Value::Number(value) if value.is_i64() || value.is_u64() => value.to_string(),
 				_ => {
-					println!("{}", format!("[ERROR] \"forge_version\" must be a string or integer").red());
+					println!("{}", "[ERROR] \"forge_version\" must be a string or integer".red());
 					return Err(std::io::Error::new(
 						std::io::ErrorKind::InvalidData,
 						"forge_version must be a string or integer",
@@ -110,7 +110,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				serde_json::Value::String(value) => value.clone(),
 				serde_json::Value::Number(value) if value.is_i64() || value.is_u64() => value.to_string(),
 				_ => {
-					println!("{}", format!("[ERROR] \"neoforge_version\" must be a string or integer").red());
+					println!("{}", "[ERROR] \"neoforge_version\" must be a string or integer".red());
 					return Err(std::io::Error::new(
 						std::io::ErrorKind::InvalidData,
 						"neoforge_version must be a string or integer",
@@ -126,11 +126,11 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				settings["paths"]["icon"]
 					.as_str()
 					.ok_or_else(|| {
-						println!("{}", format!("[ERROR] pack.json[\"paths\"][\"icon\"] must be a string.").red());
-						return io::Error::new(
+						println!("{}", "[ERROR] pack.json[\"paths\"][\"icon\"] must be a string.".red());
+						io::Error::new(
 							io::ErrorKind::InvalidData,
 							"pack.json: paths.icon must be a string",
-						);
+						)
 					})?
 				}
 			),

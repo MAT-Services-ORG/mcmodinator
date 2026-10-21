@@ -76,7 +76,7 @@ fn add_folder_to_zip(
 				&path,
 				sub_arcname.to_str().unwrap(),
 			)?;
-			
+
 		} else if path.is_file() {
 			zip.start_file(Path::new(arcname).join(path.strip_prefix(folder_path)?).to_str().unwrap(), SimpleFileOptions::default())?;
 			io::copy(&mut File::open(&path)?, zip)?;
@@ -117,16 +117,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		}
 	}
 
-	if match args.mod_build.to_lowercase().as_str() {
-		"false" | "f" | "no" | "n" | "none" => false,
-		_ => true
-	} {bmod::build(&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path)?}
-	if match args.cpack_build.to_lowercase().as_str() {
-		"false" | "f" | "no" | "n" | "none" => false,
-		_ => true
-	} {bcpack::build(/*&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path*/)?}
+	if !matches!(args.mod_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bmod::build(&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path)?}
+	if !matches!(args.cpack_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bcpack::build(/*&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path*/)?}
 	println!("{}", "[DONE] Finished execution !".green());
-	return Ok(());
+	Ok(())
 }
 
 /* TODO:

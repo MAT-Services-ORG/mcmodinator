@@ -6,25 +6,23 @@ fn import_folder(
 	output_name: &str,
 	output_type: &str
 ) -> Result<(), Box<dyn std::error::Error>> {
-	if let Some(path) = given_path.and_then(|x| x.as_str()) {
-		if !path.is_empty() {
-			match add_folder_to_zip(
-				zip,
-				Path::new(path),
-				output_type,
-			) {
-				Ok(count) => {
-					println!("{}", format!("[INFO] Added {count} {output_name}").blue());
-				}
-				Err(error) => {
-					if error
-						.downcast_ref::<io::Error>()
-						.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
-					{
-						println!("{}", format!("[WARN] {output_name} not found at provided path.").yellow());
-					} else {
-						println!("{}", format!("[ERROR] {error}").red());
-					}
+	if let Some(path) = given_path.and_then(|x| x.as_str()) && !path.is_empty() {
+		match add_folder_to_zip(
+			zip,
+			Path::new(path),
+			output_type,
+		) {
+			Ok(count) => {
+				println!("{}", format!("[INFO] Added {count} {output_name}").blue());
+			}
+			Err(error) => {
+				if error
+					.downcast_ref::<io::Error>()
+					.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
+				{
+					println!("{}", format!("[WARN] {output_name} not found at provided path.").yellow());
+				} else {
+					println!("{}", format!("[ERROR] {error}").red());
 				}
 			}
 		}
@@ -38,7 +36,7 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 		_ => mod_build.to_string()
 	};
 	let file = File::create(&modfilename).map_err(|error| {
-		println!("{}", format!("[ERROR] {}", error.to_string()).red());
+		println!("{}", format!("[ERROR] {}", error).red());
 		io::Error::new(error.kind(), error.to_string())
 	})?;
 	let mut zip = ZipWriter::new(file);
@@ -121,29 +119,25 @@ description="{description}"
 	).as_bytes())?;
 
 	// Icon
-	if let Some(icon_path) = mod_info.paths.get("icon").and_then(|x| x.as_str()) {
-		if !icon_path.is_empty() {
-			match fs::read(icon_path) {
-				Ok(data) => {
-					zip.start_file(
-						"icon.png",
-						SimpleFileOptions::default(),
-					)?;
-
-					zip.write_all(&data)?;
-
-					println!("{}", "[INFO] Added icon".blue());
-				}
-				
+	if let Some(icon_path) = mod_info.paths.get("icon").and_then(|x| x.as_str()) && !icon_path.is_empty() {
+		match fs::read(icon_path) {
+			Ok(data) => {
+				zip.start_file(
+					"icon.png",
+					SimpleFileOptions::default(),
+				)?;
+				zip.write_all(&data)?;
+				println!("{}", "[INFO] Added icon".blue());
+			}
+		
 				Err(error) => {
-					if error.kind() == io::ErrorKind::NotFound {
-					
-						println!(
-							"{}", "[WARN] Icon not found at provided path.".yellow(),
-						);
-					} else {
-						println!("{}", format!("[ERROR] {}", error).red());
-					}
+				if error.kind() == io::ErrorKind::NotFound {
+				
+					println!(
+						"{}", "[WARN] Icon not found at provided path.".yellow(),
+					);
+				} else {
+					println!("{}", format!("[ERROR] {}", error).red());
 				}
 			}
 		}
