@@ -41,7 +41,7 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 	})?;
 	let mut zip = ZipWriter::new(file);
 	
-	// Fabric
+	// Fabric Metadata
 	let mut fabric = json!({
 		"schemaVersion": 1,
 		"id": mod_info.id,
@@ -51,19 +51,10 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 		"authors": mod_info.authors,
 		"license": mod_info.license,
 	});
+	if mod_info.icon.is_file() {fabric["icon"] = serde_json::Value::String(mod_info.icon.to_str().unwrap().to_string());}
 
-	if mod_info.icon.is_file() {
-		fabric["icon"] = serde_json::Value::String(mod_info.icon.to_str().unwrap().to_string());
-	}
-
-	let fabric_json = serde_json::to_string(&fabric)?;
-
-	zip.start_file(
-		"fabric.mod.json",
-		SimpleFileOptions::default(),
-	)?;
-
-	zip.write_all(fabric_json.as_bytes())?;
+	zip.start_file("fabric.mod.json", SimpleFileOptions::default())?;
+	zip.write_all(serde_json::to_string(&fabric)?.as_bytes())?;
 
 
 	// Forge MataData
@@ -93,6 +84,7 @@ description="{description}"
 		logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
 	).as_bytes())?;
 
+	// NeoForge MetaData
 	zip.start_file("META-INF/neoforge.mods.toml", SimpleFileOptions::default())?;
 	zip.write_all(format!(
 r#"modLoader="lowcodefml"
@@ -167,7 +159,19 @@ description="{description}"
 			import_folder(mod_info.paths["kubeloader"].get("server-js"), &mut zip, "Server Scripts", "contentpacks/server_scripts")?; // server-js
 			import_folder(mod_info.paths["kubeloader"].get("client-js"), &mut zip, "Client Scripts", "contentpacks/client_scripts")?; // client-js
 			import_folder(mod_info.paths["kubeloader"].get("startup-js"), &mut zip, "Startup Scripts", "contentpacks/startup_scripts")?; // startup-js
-			// TODO: Generate KUBELOADER metadatas. (Check https://github.com/WhiseNT/kubeloader_wiki-en/wiki/Content-Packs )
+			// KUBELOADER metadatas. (Check https://github.com/WhiseNT/kubeloader_wiki-en/wiki/Content-Packs )
+
+			zip.start_file("contentpacks/contentpacks.json", SimpleFileOptions::default())?;
+			zip.write_all(
+				serde_json::to_string(&json!({
+					"id": mod_info.id,
+					"version": mod_info.version,
+					"name": mod_info.display_name,
+					"description": mod_info.description,
+					"authors": mod_info.authors,
+					"license": mod_info.license,
+				})
+			)?.as_bytes())?;
 		} else {
 			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow());
 		};
