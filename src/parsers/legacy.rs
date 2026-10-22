@@ -17,8 +17,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 		.ok_or_else(|| {
 			println!("{}", "[ERROR] Cannot parse [mod_info]. Check if your syntax is valid.".red());
 			io::Error::new(io::ErrorKind::InvalidData, "cannot parse [mod_info] in settings.toml")
-		})
-		.unwrap(); 
+		})?; 
 	let paths: serde_json::Value = json!({
 		"assets": settings["paths"]["assets"],
 		"data": settings["paths"]["data"],

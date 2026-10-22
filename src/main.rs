@@ -78,7 +78,7 @@ fn add_folder_to_zip(
 			)?;
 
 		} else if path.is_file() {
-			zip.start_file(Path::new(arcname).join(path.strip_prefix(folder_path)?).to_str().unwrap(), SimpleFileOptions::default())?;
+			zip.start_file_from_path(Path::new(arcname).join(path.strip_prefix(folder_path)?), SimpleFileOptions::default())?;
 			io::copy(&mut File::open(&path)?, zip)?;
 
 			count += 1;
@@ -88,6 +88,26 @@ fn add_folder_to_zip(
 	Ok(count)
 }
 
+pub fn escape_toml_string(value: &str) -> String {
+    let mut escaped = String::with_capacity(value.len());
+
+    for ch in value.chars() {
+        match ch {
+            '\\' => escaped.push_str("\\\\"),
+            '"' => escaped.push_str("\\\""),
+            '\n' => escaped.push_str("\\n"),
+            '\r' => escaped.push_str("\\r"),
+            '\t' => escaped.push_str("\\t"),
+            ch if ch.is_control() => {
+                use std::fmt::Write;
+                write!(&mut escaped, "\\u{:04X}", ch as u32).unwrap();
+            }
+            ch => escaped.push(ch),
+        }
+    }
+
+    escaped
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 	// Parsing arguments
@@ -134,4 +154,5 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 				ordering="NONE"
 				side="BOTH"
 		Fabric: ???
+	- Check to replace all ? by error mapers.
 */

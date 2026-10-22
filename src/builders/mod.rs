@@ -21,8 +21,10 @@ fn import_folder(
 					.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
 				{
 					println!("{}", format!("[WARN] {output_name} not found at provided path.").yellow());
+					return Ok(());
 				} else {
 					println!("{}", format!("[ERROR] {error}").red());
+					return Err(error);
 				}
 			}
 		}
@@ -32,8 +34,8 @@ fn import_folder(
 pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result<(), Box<dyn std::error::Error>> {
 	println!("[INFO] Building file..."); // Create ZIP/JAR
 	let modfilename = match mod_build {
-		"true" | "t" | "yes" | "y" => format!("{}/{}-mod.jar", output_path, mod_info.id),
-		_ => mod_build.to_string()
+		"true" | "t" | "yes" | "y" => format!("{output_path}/{}-mod.jar", mod_info.id),
+		_ => format!("{output_path}/{}", mod_build)
 	};
 	let file = File::create(&modfilename).map_err(|error| {
 		println!("{}", format!("[ERROR] {}", error).red());
@@ -56,7 +58,7 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 	zip.start_file("fabric.mod.json", SimpleFileOptions::default())?;
 	zip.write_all(serde_json::to_string(&fabric)?.as_bytes())?;
 
-
+	// TODO: Check if loader versions are present befaure writing the file.
 	// Forge MataData
 	zip.start_file("META-INF/mods.toml", SimpleFileOptions::default())?;
 	zip.write_all(format!(
@@ -74,15 +76,15 @@ authors="{authors}"
 description="{description}"
 {logo}
 "#,
-		forge_version = mod_info.forge_version,
-		license = mod_info.license,
-		id = mod_info.id,
-		version = mod_info.version,
-		display_name = mod_info.display_name,
-		authors = mod_info.authors.join(", "),
-		description = mod_info.description,
+		forge_version = escape_toml_string(&mod_info.forge_version),
+		license = escape_toml_string(&mod_info.license),
+		id = escape_toml_string(&mod_info.id),
+		version = escape_toml_string(&mod_info.version),
+		display_name = escape_toml_string(&mod_info.display_name),
+		authors = escape_toml_string(&mod_info.authors.join(", ")),
+		description = escape_toml_string(&mod_info.description),
 		logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
-	).as_bytes())?;
+	).as_bytes())?; 
 
 	// NeoForge MetaData
 	zip.start_file("META-INF/neoforge.mods.toml", SimpleFileOptions::default())?;
@@ -100,13 +102,13 @@ authors="{authors}"
 description="{description}"
 {logo}
 "#,
-		neo_version = mod_info.neoforge_version,
-		license = mod_info.license,
-		id = mod_info.id,
-		version = mod_info.version,
-		display_name = mod_info.display_name,
-		authors = mod_info.authors.join(", "),
-		description = mod_info.description,
+		neo_version = escape_toml_string(&mod_info.neoforge_version),
+		license = escape_toml_string(&mod_info.license),
+		id = escape_toml_string(&mod_info.id),
+		version = escape_toml_string(&mod_info.version),
+		display_name = escape_toml_string(&mod_info.display_name),
+		authors = escape_toml_string(&mod_info.authors.join(", ")),
+		description = escape_toml_string(&mod_info.description),
 		logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
 	).as_bytes())?;
 
@@ -170,8 +172,10 @@ description="{description}"
 					"description": mod_info.description,
 					"authors": mod_info.authors,
 					"license": mod_info.license,
-				})
-			)?.as_bytes())?;
+				}))?
+				.as_bytes()
+			)?;
+			// TODO: Add a dependency to the DEPENDENCIES metadatas.
 		} else {
 			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow());
 		};
