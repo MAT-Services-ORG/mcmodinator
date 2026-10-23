@@ -58,59 +58,62 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 	zip.start_file("fabric.mod.json", SimpleFileOptions::default())?;
 	zip.write_all(serde_json::to_string(&fabric)?.as_bytes())?;
 
-	// TODO: Check if loader versions are present befaure writing the file.
 	// Forge MataData
-	zip.start_file("META-INF/mods.toml", SimpleFileOptions::default())?;
-	zip.write_all(format!(
+	if mod_info.forge_version.is_empty() {
+		zip.start_file("META-INF/mods.toml", SimpleFileOptions::default())?;
+		zip.write_all(format!(
 
-r#"modLoader="lowcodefml"
-loaderVersion="{forge_version}"
+	r#"modLoader="lowcodefml"
+	loaderVersion="{forge_version}"
 
-license="{license}"
+	license="{license}"
 
-[[mods]]
-modId="{id}"
-version="{version}"
-displayName="{display_name}"
-authors="{authors}"
-description="{description}"
-{logo}
-"#,
-		forge_version = escape_toml_string(&mod_info.forge_version),
-		license = escape_toml_string(&mod_info.license),
-		id = escape_toml_string(&mod_info.id),
-		version = escape_toml_string(&mod_info.version),
-		display_name = escape_toml_string(&mod_info.display_name),
-		authors = escape_toml_string(&mod_info.authors.join(", ")),
-		description = escape_toml_string(&mod_info.description),
-		logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
-	).as_bytes())?; 
+	[[mods]]
+	modId="{id}"
+	version="{version}"
+	displayName="{display_name}"
+	authors="{authors}"
+	description="{description}"
+	{logo}
+	"#,
+			forge_version = escape_toml_string(&mod_info.forge_version),
+			license = escape_toml_string(&mod_info.license),
+			id = escape_toml_string(&mod_info.id),
+			version = escape_toml_string(&mod_info.version),
+			display_name = escape_toml_string(&mod_info.display_name),
+			authors = escape_toml_string(&mod_info.authors.join(", ")),
+			description = escape_toml_string(&mod_info.description),
+			logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
+		).as_bytes())?; 
+	}
 
 	// NeoForge MetaData
-	zip.start_file("META-INF/neoforge.mods.toml", SimpleFileOptions::default())?;
-	zip.write_all(format!(
-r#"modLoader="lowcodefml"
-loaderVersion="{neo_version}" 
+	if mod_info.neoforge_version.is_empty() {
+		zip.start_file("META-INF/neoforge.mods.toml", SimpleFileOptions::default())?;
+		zip.write_all(format!(
+	r#"modLoader="lowcodefml"
+	loaderVersion="{neo_version}" 
 
-license="{license}"
+	license="{license}"
 
-[[mods]]
-modId="{id}"
-version="{version}"
-displayName="{display_name}"
-authors="{authors}"
-description="{description}"
-{logo}
-"#,
-		neo_version = escape_toml_string(&mod_info.neoforge_version),
-		license = escape_toml_string(&mod_info.license),
-		id = escape_toml_string(&mod_info.id),
-		version = escape_toml_string(&mod_info.version),
-		display_name = escape_toml_string(&mod_info.display_name),
-		authors = escape_toml_string(&mod_info.authors.join(", ")),
-		description = escape_toml_string(&mod_info.description),
-		logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
-	).as_bytes())?;
+	[[mods]]
+	modId="{id}"
+	version="{version}"
+	displayName="{display_name}"
+	authors="{authors}"
+	description="{description}"
+	{logo}
+	"#,
+			neo_version = escape_toml_string(&mod_info.neoforge_version),
+			license = escape_toml_string(&mod_info.license),
+			id = escape_toml_string(&mod_info.id),
+			version = escape_toml_string(&mod_info.version),
+			display_name = escape_toml_string(&mod_info.display_name),
+			authors = escape_toml_string(&mod_info.authors.join(", ")),
+			description = escape_toml_string(&mod_info.description),
+			logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
+		).as_bytes())?;
+	}
 
 	// Icon
 	if let Some(icon_path) = mod_info.paths.get("icon").and_then(|x| x.as_str()) && !icon_path.is_empty() {
@@ -123,8 +126,7 @@ description="{description}"
 				zip.write_all(&data)?;
 				println!("{}", "[INFO] Added icon".blue());
 			}
-		
-				Err(error) => {
+			Err(error) => {
 				if error.kind() == io::ErrorKind::NotFound {
 				
 					println!(
