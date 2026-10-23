@@ -39,7 +39,7 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 	};
 	let file = File::create(&modfilename).map_err(|error| {
 		println!("{}", format!("[ERROR] {}", error).red());
-		io::Error::new(error.kind(), error.to_string())
+		io::Error::new(error.kind(), error)
 	})?;
 	let mut zip = ZipWriter::new(file);
 	

@@ -64,7 +64,10 @@ fn add_folder_to_zip(
 ) -> Result<usize, Box<dyn std::error::Error>> {
 	let mut count = 0;
 
-	for entry in fs::read_dir(folder_path)? {
+	for entry in fs::read_dir(folder_path).map_err(|error| {
+		println!("{}", format!("[ERROR] {}", error).red());
+		io::Error::new(error.kind(), error.to_string())
+	})? {
 		let path = entry?.path();
 
 		if path.is_dir() {
