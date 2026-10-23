@@ -54,7 +54,8 @@ pub struct ModInfo {
 	forge_version: String,
 	neoforge_version: String,
 	icon: PathBuf,
-	paths: serde_json::Value
+	paths: serde_json::Value,
+	dependency: serde_json::Value
 }
 
 fn add_folder_to_zip(
@@ -112,6 +113,13 @@ pub fn escape_toml_string(value: &str) -> String {
     escaped
 }
 
+/*pub fn json_to_toml(value: serde_json::Value) -> String {
+	let mut toml = String::new();
+	for key in value.as_object() {
+		toml=format!("{toml}/n{key}")
+	};
+} */
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 	// Parsing arguments
 	let args: Args = Args::parse();
@@ -157,5 +165,4 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 				ordering="NONE"
 				side="BOTH"
 		Fabric: ???
-	- Check to replace all ? by error mapers.
 */

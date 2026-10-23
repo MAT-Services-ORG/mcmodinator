@@ -42,6 +42,8 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		}
 	};
 
+	let dependency = if settings["dependencies"].is_null() {settings["dependencies"].clone()} else {serde_json::value::Value::String("".to_string())};
+
 	Ok(ModInfo {
 		id: settings["modinator"]["id"]
 			.as_str()
@@ -134,7 +136,8 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 					})?
 				}
 			),
-		paths: settings["paths"].clone()
+		paths: settings["paths"].clone(),
+		dependency
 	})
 	/* PathsSettings will return:
 		assets = "assets/"

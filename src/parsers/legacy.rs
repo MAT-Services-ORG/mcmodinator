@@ -130,6 +130,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 					"settings.toml: paths.icon must be a string",
 				)
 			})?),
-		paths//: paths.clone()
+		paths,//: paths.clone()
+		dependency: json!({}) // TODO: Legacy Dependancies
 	})
 }

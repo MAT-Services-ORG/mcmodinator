@@ -42,78 +42,6 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 		io::Error::new(error.kind(), error)
 	})?;
 	let mut zip = ZipWriter::new(file);
-	
-	// Fabric Metadata
-	let mut fabric = json!({
-		"schemaVersion": 1,
-		"id": mod_info.id,
-		"version": mod_info.version,
-		"name": mod_info.display_name,
-		"description": mod_info.description,
-		"authors": mod_info.authors,
-		"license": mod_info.license,
-	});
-	if mod_info.icon.is_file() {fabric["icon"] = serde_json::Value::String(mod_info.icon.to_str().unwrap().to_string());}
-
-	zip.start_file("fabric.mod.json", SimpleFileOptions::default())?;
-	zip.write_all(serde_json::to_string(&fabric)?.as_bytes())?;
-
-	// Forge MataData
-	if mod_info.forge_version.is_empty() {
-		zip.start_file("META-INF/mods.toml", SimpleFileOptions::default())?;
-		zip.write_all(format!(
-
-	r#"modLoader="lowcodefml"
-	loaderVersion="{forge_version}"
-
-	license="{license}"
-
-	[[mods]]
-	modId="{id}"
-	version="{version}"
-	displayName="{display_name}"
-	authors="{authors}"
-	description="{description}"
-	{logo}
-	"#,
-			forge_version = escape_toml_string(&mod_info.forge_version),
-			license = escape_toml_string(&mod_info.license),
-			id = escape_toml_string(&mod_info.id),
-			version = escape_toml_string(&mod_info.version),
-			display_name = escape_toml_string(&mod_info.display_name),
-			authors = escape_toml_string(&mod_info.authors.join(", ")),
-			description = escape_toml_string(&mod_info.description),
-			logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
-		).as_bytes())?; 
-	}
-
-	// NeoForge MetaData
-	if mod_info.neoforge_version.is_empty() {
-		zip.start_file("META-INF/neoforge.mods.toml", SimpleFileOptions::default())?;
-		zip.write_all(format!(
-	r#"modLoader="lowcodefml"
-	loaderVersion="{neo_version}" 
-
-	license="{license}"
-
-	[[mods]]
-	modId="{id}"
-	version="{version}"
-	displayName="{display_name}"
-	authors="{authors}"
-	description="{description}"
-	{logo}
-	"#,
-			neo_version = escape_toml_string(&mod_info.neoforge_version),
-			license = escape_toml_string(&mod_info.license),
-			id = escape_toml_string(&mod_info.id),
-			version = escape_toml_string(&mod_info.version),
-			display_name = escape_toml_string(&mod_info.display_name),
-			authors = escape_toml_string(&mod_info.authors.join(", ")),
-			description = escape_toml_string(&mod_info.description),
-			logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""}
-		).as_bytes())?;
-	}
 
 	// Icon
 	if let Some(icon_path) = mod_info.paths.get("icon").and_then(|x| x.as_str()) && !icon_path.is_empty() {
@@ -182,6 +110,84 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow());
 		};
 	} 
+
+// Forge MataData
+	if mod_info.forge_version.is_empty() {
+		zip.start_file("META-INF/mods.toml", SimpleFileOptions::default())?;
+		zip.write_all(format!(
+
+r#"modLoader="lowcodefml"
+loaderVersion="{forge_version}"
+
+license="{license}"
+
+[[mods]]
+	modId="{id}"
+	version="{version}"
+	displayName="{display_name}"
+	authors="{authors}"
+	description="{description}"
+	{logo}
+
+{dependancies}
+"#,
+			forge_version = escape_toml_string(&mod_info.forge_version),
+			license = escape_toml_string(&mod_info.license),
+			id = escape_toml_string(&mod_info.id),
+			version = escape_toml_string(&mod_info.version),
+			display_name = escape_toml_string(&mod_info.display_name),
+			authors = escape_toml_string(&mod_info.authors.join(", ")),
+			description = escape_toml_string(&mod_info.description),
+			logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""},
+			dependancies=mod_info.dependency // TODO: DEPENDANCIES
+		).as_bytes())?; 
+	}
+
+	// NeoForge MetaData
+	if mod_info.neoforge_version.is_empty() {
+		zip.start_file("META-INF/neoforge.mods.toml", SimpleFileOptions::default())?;
+		zip.write_all(format!(
+r#"modLoader="lowcodefml"
+loaderVersion="{neo_version}" 
+
+license="{license}"
+
+[[mods]]
+	modId="{id}"
+	version="{version}"
+	displayName="{display_name}"
+	authors="{authors}"
+	description="{description}"
+	{logo}
+
+{dependancies}
+"#,
+			neo_version = escape_toml_string(&mod_info.neoforge_version),
+			license = escape_toml_string(&mod_info.license),
+			id = escape_toml_string(&mod_info.id),
+			version = escape_toml_string(&mod_info.version),
+			display_name = escape_toml_string(&mod_info.display_name),
+			authors = escape_toml_string(&mod_info.authors.join(", ")),
+			description = escape_toml_string(&mod_info.description),
+			logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""},
+			dependancies="" // TODO: DEPENDANCIES
+		).as_bytes())?;
+	}
+
+	// Fabric Metadata
+	let mut fabric = json!({
+		"schemaVersion": 1,
+		"id": mod_info.id,
+		"version": mod_info.version,
+		"name": mod_info.display_name,
+		"description": mod_info.description,
+		"authors": mod_info.authors,
+		"license": mod_info.license,
+	});
+	if mod_info.icon.is_file() {fabric["icon"] = serde_json::Value::String(mod_info.icon.to_str().unwrap().to_string())}
+
+	zip.start_file("fabric.mod.json", SimpleFileOptions::default())?;
+	zip.write_all(serde_json::to_string(&fabric)?.as_bytes())?;
 
 	// Finish ZIP
 	zip.finish()?;
