@@ -170,7 +170,7 @@ license="{license}"
 			authors = escape_toml_string(&mod_info.authors.join(", ")),
 			description = escape_toml_string(&mod_info.description),
 			logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""},
-			dependancies="" // TODO: DEPENDANCIES
+			dependancies=format!("[[dependencies.{}]]", mod_info.id) // TODO: !!! DEPENDANCIES 
 		).as_bytes())?;
 	}
 

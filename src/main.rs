@@ -113,12 +113,14 @@ pub fn escape_toml_string(value: &str) -> String {
     escaped
 }
 
-/*pub fn json_to_toml(value: serde_json::Value) -> String {
-	let mut toml = String::new();
-	for key in value.as_object() {
-		toml=format!("{toml}/n{key}")
+pub fn json_to_toml(value: serde_json::Value) -> String {
+	let mut ctoml = String::new();
+	for key in value.as_object().unwrap().keys() {
+    	ctoml.push_str(format!("{key}={}", value[key]).as_str());
+		ctoml.push('\n');
 	};
-} */
+	ctoml
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 	// Parsing arguments

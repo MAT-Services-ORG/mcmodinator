@@ -1,7 +1,7 @@
 { // WARNING: The comments will be considered as errors by serde_json. Do not use them in the final pack.mcmeta.
 	"pack": {
 		"description": "My custom pack",
-		"pack_format": 121, // TODO: Used to define modId="minecraft" dependancy.
+		"pack_format": 121, // TODO: Used to define modId="minecraft" dependancy. So... Optional.
 		"supported_formats": {
 			"min_inclusive": 4,
 			"max_inclusive": 121
@@ -19,7 +19,6 @@
 		//issueTrackerURL="https://github.com/MinecraftForge/MinecraftForge/issues"
 		//showAsResourcePack=false
 		//clientSideOnly=false 
-
 	},
 	"paths": { // Values can be set to None for none.
 		"icon": "./icon.png",
@@ -38,8 +37,8 @@
 			"ordering": "NONE", // Optional Defines if the mod must load before ("BEFORE") or after ("AFTER") this dependency. If the ordering does not matter, return "NONE"
 			"side": "BOTH" // "BOTH", "CLIENT", "SERVER"
 		}/*
-		[[dependencies.confluencerechiseled]]
-			modId="minecraft" // In any cases ?
+		[[dependencies.mymod]]
+			modId="anecessarymod" 
 			type="required"
 			# This version range declares a minimum of the current minecraft version up to but not including the next major version
 			versionRange="[1.21.1]"
