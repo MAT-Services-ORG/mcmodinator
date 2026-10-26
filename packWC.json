@@ -15,8 +15,8 @@
 		"license": "MIT",
 		"forge_version": "[1,)", // https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html are supported as strings for "forge_version" and "neoforge_version". You can also use integers when exact versions.
 		"neoforge_version": "[1,)"
-		// TODO: More ?
-		//issueTrackerURL="https://github.com/MinecraftForge/MinecraftForge/issues"
+		//// TODO: More ? https://docs.fabricmc.net/develop/loader/fabric-mod-json
+		//issueTrackerURL="https://github.com/MinecraftForge/MinecraftForge/issues" // (See https://docs.fabricmc.net/develop/loader/fabric-mod-json#dependency-resolution for Fabric)
 		//showAsResourcePack=false
 		//clientSideOnly=false 
 	},
@@ -47,4 +47,4 @@
 		*/ 
 		}
 }
-// TODO: Update to other packs in pack.json and READE.md.
+// TODO: Update to other packs in pack.json and README.md.

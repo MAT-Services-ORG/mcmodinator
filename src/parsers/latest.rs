@@ -42,7 +42,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		}
 	};
 
-	let dependency = if settings["dependencies"].is_null() {settings["dependencies"].clone()} else {serde_json::value::Value::String("".to_string())};
+	let dependency = if settings["dependencies"].is_null() {serde_json::value::Value::String("".to_string())} else {settings["dependencies"].clone()};
 
 	Ok(ModInfo {
 		id: settings["modinator"]["id"]

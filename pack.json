@@ -1,7 +1,7 @@
-{
+{ 
 	"pack": {
 		"description": "My custom pack",
-		"pack_format": 121,
+		"pack_format": 121, 
 		"supported_formats": {
 			"min_inclusive": 4,
 			"max_inclusive": 121
@@ -13,16 +13,25 @@
 		"mod_version": "1.0.0",
 		"authors": ["Myself"],
 		"license": "MIT",
-		"forge_version": "[1,)"
+		"forge_version": "[1,)",
+		"neoforge_version": "[1,)"
 	},
-	"paths": {
+	"paths": { 
 		"icon": "./icon.png",
 		"assets": "./assets/",
 		"data": "./data/",
-		"kubeloader": {
+		"kubeloader": { 
 			"server-js": "./server_scripts/",
 			"client-js": "./client_scripts/",
 			"startup-js": "./startup_scripts/"
+		}
+	},
+	"dependencies": {
+		"examplemod": { 
+			"type": "required",
+			"versionRange": "", 
+			"ordering": "NONE",
+			"side": "BOTH"
 		}
 	}
 }
