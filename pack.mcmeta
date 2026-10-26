@@ -1,4 +1,4 @@
-{
+{ 
 	"pack": {
 		"description": "My custom pack",
 		"pack_format": 121,
@@ -8,12 +8,13 @@
 		}
 	},
 	"modinator": {
-		"id": "mymod",
+		"id": "mymod", 
 		"display_name": "My Mod",
 		"mod_version": "1.0.0",
 		"authors": ["Myself"],
 		"license": "MIT",
-		"forge_version": "[1,)"
+		"forge_version": "[1,)", 
+		"neoforge_version": "[1,)"
 	},
 	"paths": {
 		"icon": "./icon.png",
@@ -23,6 +24,16 @@
 			"server-js": "./server_scripts/",
 			"client-js": "./client_scripts/",
 			"startup-js": "./startup_scripts/"
+		}
+	},
+	"dependencies": { 
+		"examplemod": { 
+			"forge": { 
+				"type": "required", 
+				"versionRange": "", 
+				"side": "BOTH" 
+			},
+			"fabric": "*" 
 		}
 	}
 }

@@ -1,15 +1,13 @@
 // This project is an hanced Rust equivalent of https://github.com/T0RNATO/datapackmodinator/ script.
 // Voir les informations sur le fichier externe pour le tas d'amélioration et d'oublis restants.
-use serde_json::{Value, json};
-use std::fs::{self, File, /*exists*/};
+use serde_json::json;
+use std::fs::{self, File};
 use std::io::{self, Write};
 use std::path::Path;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
-//use std::env::{self, args};
 use clap::Parser;
 use colored::Colorize;
-use toml::Table;
 use std::path::PathBuf;
 
 #[path = "parsers/legacy.rs"] mod plegacy;
@@ -56,7 +54,8 @@ pub struct ModInfo {
 	forge_version: String,
 	neoforge_version: String,
 	icon: PathBuf,
-	paths: toml::map::Map<String, toml::Value> 
+	paths: serde_json::Value,
+	dependency: serde_json::Value
 }
 
 fn add_folder_to_zip(
@@ -66,9 +65,11 @@ fn add_folder_to_zip(
 ) -> Result<usize, Box<dyn std::error::Error>> {
 	let mut count = 0;
 
-	for entry in fs::read_dir(folder_path)? {
-		let entry = entry?;
-		let path = entry.path();
+	for entry in fs::read_dir(folder_path).map_err(|error| {
+		println!("{}", format!("[ERROR] {}", error).red());
+		io::Error::new(error.kind(), error.to_string())
+	})? {
+		let path = entry?.path();
 
 		if path.is_dir() {
 			let relative = path.strip_prefix(folder_path)?;
@@ -79,16 +80,10 @@ fn add_folder_to_zip(
 				&path,
 				sub_arcname.to_str().unwrap(),
 			)?;
+
 		} else if path.is_file() {
-			let relative = path.strip_prefix(folder_path)?;
-			let archive_path = Path::new(arcname).join(relative);
-
-			let archive_path = archive_path.to_str().unwrap();
-
-			zip.start_file(archive_path, SimpleFileOptions::default())?;
-
-			let mut file = File::open(&path)?;
-			io::copy(&mut file, zip)?;
+			zip.start_file_from_path(Path::new(arcname).join(path.strip_prefix(folder_path)?), SimpleFileOptions::default())?;
+			io::copy(&mut File::open(&path)?, zip)?;
 
 			count += 1;
 		}
@@ -97,6 +92,35 @@ fn add_folder_to_zip(
 	Ok(count)
 }
 
+pub fn escape_toml_string(value: &str) -> String {
+    let mut escaped = String::with_capacity(value.len());
+
+    for ch in value.chars() {
+        match ch {
+            '\\' => escaped.push_str("\\\\"),
+            '"' => escaped.push_str("\\\""),
+            '\n' => escaped.push_str("\\n"),
+            '\r' => escaped.push_str("\\r"),
+            '\t' => escaped.push_str("\\t"),
+            ch if ch.is_control() => {
+                use std::fmt::Write;
+                write!(&mut escaped, "\\u{:04X}", ch as u32).unwrap();
+            }
+            ch => escaped.push(ch),
+        }
+    }
+
+    escaped
+}
+
+pub fn json_to_toml(value: serde_json::Value) -> String {
+	let mut ctoml = String::new();
+	for key in value.as_object().unwrap().keys() {
+    	ctoml.push_str(format!("{key}={}", value[key]).as_str());
+		ctoml.push('\n');
+	};
+	ctoml
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 	// Parsing arguments
@@ -111,7 +135,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	println!("MAT Modinator\nModinator status:\n  Project path: {}\n  Input path: {}", args.project_path, args.output_path);
 	std::env::set_current_dir(args.project_path)?;
 
-	let mod_info = if args.legacy_parser {
+	let mut mod_info = if args.legacy_parser {
 		plegacy::get()?
 	}
 	else {
@@ -126,27 +150,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		}
 	}
 
-	if match args.mod_build.to_lowercase().as_str() {
-		"false" | "f" | "no" | "n" | "none" => false,
-		_ => true
-	} {bmod::build(&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path)?}
-	if match args.cpack_build.to_lowercase().as_str() {
-		"false" | "f" | "no" | "n" | "none" => false,
-		_ => true
-	} {bcpack::build(/*&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path*/)?}
+	if !matches!(args.mod_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bmod::build(&mut mod_info, args.mod_build.to_lowercase().as_str(), args.output_path)?}
+	if !matches!(args.cpack_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bcpack::build(/*&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path*/)?}
 	println!("{}", "[DONE] Finished execution !".green());
-	return Ok(());
+	Ok(())
 }
-
-/* TODO:
-	- Dependencies
-		Forge: 
-			[[dependencies.confluencerechiseled]]
-			    modId="minecraft"
-				type="required"
-				# This version range declares a minimum of the current minecraft version up to but not including the next major version
-				versionRange="[1.21.1]"
-				ordering="NONE"
-				side="BOTH"
-		Fabric: ???
-*/
