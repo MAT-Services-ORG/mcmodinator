@@ -83,7 +83,7 @@ pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: String) -> Re
 		print!(
 			"{}",
 			format!(
-				"[CAUT] KUBELOADER technology is unfinished, problems can heppends if you chosse to continue.\n       ┃ We advise you to check if a relase is aviable: https://github.com/MAT-Services-ORG/mcmodinator/releases\n       ┃ Actual version: {}\n       ┃ Continue with KL integrations? [y/N]\n       ┣━╸ ",
+				"[CAUT] KUBELOADER technology is unfinished, problems can heppends if you chosse to continue.\n       We advise you to check if a relase is aviable: https://github.com/MAT-Services-ORG/mcmodinator/releases\n       Actual version: {}\n       Continue with KL integrations? [y/N]\n  INPUT▐",
 				env!("CARGO_PKG_VERSION")
 			)
 			.bright_red()
@@ -92,7 +92,7 @@ pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: String) -> Re
 		let mut input = String::new();
 		io::stdin().read_line(&mut input)?;
 		if input.trim().eq_ignore_ascii_case("y") {
-			println!("{}","       ┃ Loading KubeLoader integrations at your risk.\n       ╹".bright_red());
+			println!("{}","       Loading KubeLoader integrations at your risk.".bright_red());
 			import_folder(mod_info.paths["kubeloader"].get("server-js"), &mut zip, "Server Scripts", "contentpacks/server_scripts")?; // server-js
 			import_folder(mod_info.paths["kubeloader"].get("client-js"), &mut zip, "Client Scripts", "contentpacks/client_scripts")?; // client-js
 			import_folder(mod_info.paths["kubeloader"].get("startup-js"), &mut zip, "Startup Scripts", "contentpacks/startup_scripts")?; // startup-js
@@ -113,7 +113,7 @@ pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: String) -> Re
 			mod_info.dependency["kubeloader"]["forge"]["versionRange"] = "".into(); 
 			mod_info.dependency["kubeloader"]["fabric"] = "*".into(); 
 		} else {
-			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow());
+			println!("{}","       Aborting KubeLoader integration.".yellow());
 		};
 	} 
 
