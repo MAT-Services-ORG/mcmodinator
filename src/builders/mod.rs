@@ -21,6 +21,11 @@ fn import_folder(
 					.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
 				{
 					println!("{}", format!("[WARN] {output_name} not found at provided path.").yellow());
+					println!("{}\n{}{}", 
+						"[HELP] For more informations about CLI usage, type:".blue(),
+						"       ▐".blue(),
+						"modinator --help".on_bright_black()
+					);
 					return Ok(());
 				} else {
 					println!("{}", format!("[ERROR] {error}").red());
@@ -31,7 +36,7 @@ fn import_folder(
 	}
 	Ok(())
 }
-pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result<(), Box<dyn std::error::Error>> {
+pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: String) -> Result<(), Box<dyn std::error::Error>> {
 	println!("[INFO] Building file..."); // Create ZIP/JAR
 	let modfilename = match mod_build {
 		"true" | "t" | "yes" | "y" => format!("{output_path}/{}-mod.jar", mod_info.id),
@@ -105,7 +110,8 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 				}))?
 				.as_bytes()
 			)?;
-			// TODO: Add a dependency to the DEPENDENCIES metadatas.
+			mod_info.dependency["kubeloader"]["forge"]["versionRange"] = "".into(); 
+			mod_info.dependency["kubeloader"]["fabric"] = "*".into(); 
 		} else {
 			println!("{}","       ┃ Aborting KubeLoader integration.\n       ╹".yellow());
 		};

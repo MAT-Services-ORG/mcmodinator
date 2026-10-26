@@ -16,6 +16,10 @@ pub fn doc(topic: &str) {
 		"LIST": [
 			"Shows a list of all topics",
 			format!("{}", "List of topics:".underline().bold())
+		],
+		"PACK": [
+			"Shows informations about PACK.MCMETA structure",
+			"Doccumentation not written yet."
 		]
 	}); // TODO: Add topics.
 

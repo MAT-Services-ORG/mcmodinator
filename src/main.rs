@@ -135,7 +135,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	println!("MAT Modinator\nModinator status:\n  Project path: {}\n  Input path: {}", args.project_path, args.output_path);
 	std::env::set_current_dir(args.project_path)?;
 
-	let mod_info = if args.legacy_parser {
+	let mut mod_info = if args.legacy_parser {
 		plegacy::get()?
 	}
 	else {
@@ -150,7 +150,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		}
 	}
 
-	if !matches!(args.mod_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bmod::build(&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path)?}
+	if !matches!(args.mod_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bmod::build(&mut mod_info, args.mod_build.to_lowercase().as_str(), args.output_path)?}
 	if !matches!(args.cpack_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bcpack::build(/*&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path*/)?}
 	println!("{}", "[DONE] Finished execution !".green());
 	Ok(())

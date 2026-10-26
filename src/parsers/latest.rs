@@ -20,6 +20,11 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 			err.to_string()
 		};
 		println!("{}", format!("[ERROR] {}", msg).red());
+		println!("{}\n{}{}", 
+			"[HELP] For more informations about PACK.MCMETA structure, type:".blue(),
+			"       ▐".blue(),
+			"modinator --doc PACK".on_bright_black()
+		);
 		io::Error::new(serde_json::Error::io_error_kind(&err).unwrap_or(io::ErrorKind::InvalidData), msg)
 	})?;
 
@@ -35,6 +40,11 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 	for key in expected_keys {
 		if settings["modinator"][key].is_null() {
 			println!("{}", format!("[ERROR] Missing keys in modinator: {}", key).red());
+			println!("{}\n{}{}", 
+				"[HELP] For more informations about PACK.MCMETA structure, type:".blue(),
+				"       ▐".blue(),
+				"modinator --doc PACK".on_bright_black()
+			);
 			return Err(std::io::Error::new(
 				std::io::ErrorKind::InvalidData,
 				"Missing required key in settings",

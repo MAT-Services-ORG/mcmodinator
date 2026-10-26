@@ -31,7 +31,7 @@ On the new version, configuring the mod is directly via the pack.mcmeta file:
 {
 	"pack": {
 		"description": "My custom pack",
-		"pack_format": 121, // TODO: Used to define modId="minecraft" dependancy. So... Optional.
+		"pack_format": 121, // Optional
 		"supported_formats": {
 			"min_inclusive": 4,
 			"max_inclusive": 121
