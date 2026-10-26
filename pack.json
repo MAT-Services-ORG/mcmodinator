@@ -27,11 +27,14 @@
 		}
 	},
 	"dependencies": {
-		"examplemod": { 
+		"examplemod": {
+			"forge": {
 			"type": "required",
-			"versionRange": "", 
+			"versionRange": "[1,)",
 			"ordering": "NONE",
 			"side": "BOTH"
+			},
+			"fabric": "*"
 		}
 	}
 }

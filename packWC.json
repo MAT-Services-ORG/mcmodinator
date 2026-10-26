@@ -30,12 +30,15 @@
 			"startup-js": "./startup_scripts/"
 		}
 	},
-	"dependencies": { // https://docs.minecraftforge.net/en/latest/gettingstarted/modfiles/ for more informations.
+	"dependencies": { 
 		"examplemod": { // The identifier of the mod added as a dependency. Forge equivalent: Key modId.
-			"type": "required", // "requierd", "", ""
-			"versionRange": "", // Optional The acceptable version range of the language loader, expressed as a Maven Version Range. An empty string matches any version. ("" if none)
-			"ordering": "NONE", // Optional Defines if the mod must load before ("BEFORE") or after ("AFTER") this dependency. If the ordering does not matter, return "NONE"
-			"side": "BOTH" // "BOTH", "CLIENT", "SERVER"
+			"forge": { // https://docs.minecraftforge.net/en/latest/gettingstarted/modfiles/ for more informations.
+				"type": "required", // "required", "", ""
+				"versionRange": "", // Optional The acceptable version range of the language loader, expressed as a Maven Version Range. An empty string matches any version. ("" if none)
+				"ordering": "NONE", // Optional Defines if the mod must load before ("BEFORE") or after ("AFTER") this dependency. If the ordering does not matter, return "NONE"
+				"side": "BOTH" // "BOTH", "CLIENT", "SERVER"
+			},
+			"fabric": "*" // Version Range only. Optional. https://docs.fabricmc.net/develop/loader/fabric-mod-json#dependency-resolution
 		}/*
 		[[dependencies.mymod]]
 			modId="anecessarymod" 

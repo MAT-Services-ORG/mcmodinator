@@ -111,7 +111,16 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 		};
 	} 
 
-	let mut forge_dep = String::new();for dependancy in mod_info.dependency.as_object().unwrap_or(json!({}).as_object().unwrap()).keys() {forge_dep.push_str(format!("[[dependencies.{}]]\n{}\n", mod_info.id, json_to_toml(mod_info.dependency[dependancy].clone())).as_str())};
+	let mut forge_dep = String::new();
+	for dependancy in mod_info.dependency.as_object().unwrap_or(
+		json!({}).as_object().unwrap()
+	).keys() {
+		if !mod_info.dependency[dependancy]["forge"].is_null() {
+			forge_dep.push_str(
+				format!("[[dependencies.{}]]\n{}\n", mod_info.id, json_to_toml(mod_info.dependency[dependancy]["forge"].clone())).as_str()
+			)
+		}
+	};
 	// Forge MataData
 	if !mod_info.forge_version.is_empty() {
 		zip.start_file("META-INF/mods.toml", SimpleFileOptions::default())?;
@@ -175,6 +184,21 @@ license="{license}"
 		).as_bytes())?;
 	}
 
+	let mut fab_dep = json!({});
+	for value in mod_info.dependency.as_object().unwrap().keys() {
+		fab_dep[value]=if mod_info.dependency[value]["fabricRange"].is_array() {
+			serde_json::Value::Array(mod_info.dependency[value]["fabric"].as_array().unwrap().to_vec())
+		} else {
+			serde_json::Value::String(
+				if mod_info.dependency[value]["fabricRange"].is_null() {
+					"*".to_string()
+				} else {
+					mod_info.dependency[value]["fabric"].as_str().unwrap().to_string()
+				}
+			)
+		}
+	};
+	let _ = serde_json::from_str::<serde_json::Value>("mod_info");
 	// Fabric Metadata
 	let mut fabric = json!({
 		"schemaVersion": 1,
@@ -184,7 +208,7 @@ license="{license}"
 		"description": mod_info.description,
 		"authors": mod_info.authors,
 		"license": mod_info.license,
-		"depends": "" // TODO: !!! DEPENDANCIES 
+		"depends": fab_dep // TODO: !!! DEPENDANCIES 
 	});
 	if mod_info.icon.is_file() {fabric["icon"] = serde_json::Value::String(mod_info.icon.to_str().unwrap().to_string())}
 
