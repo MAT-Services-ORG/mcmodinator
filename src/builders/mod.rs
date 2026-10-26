@@ -197,7 +197,10 @@ license="{license}"
 
 	let mut fab_dep = json!({});
 	if !mod_info.dependency.is_null() {
-		for value in mod_info.dependency.as_object().unwrap().keys() {
+		for value in mod_info.dependency.as_object().ok_or_else(|| {
+			println!("{}", "[ERROR] PACK.MCMETA: \"dependencies\" must be a JSON object".red());
+			io::Error::new(io::ErrorKind::InvalidData, "\"dependencies\" must be a JSON object")
+		})?.keys() {
 			fab_dep[value]=if mod_info.dependency[value]["fabric"].is_array() {
 				serde_json::Value::Array(mod_info.dependency[value]["fabric"].as_array().unwrap().to_vec())
 			} else {
