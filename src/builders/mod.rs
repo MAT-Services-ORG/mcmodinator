@@ -117,7 +117,12 @@ pub fn build(mod_info: &ModInfo, mod_build: &str, output_path: String) -> Result
 	).keys() {
 		if !mod_info.dependency[dependancy]["forge"].is_null() {
 			forge_dep.push_str(
-				format!("[[dependencies.{}]]\n{}\n", mod_info.id, json_to_toml(mod_info.dependency[dependancy]["forge"].clone())).as_str()
+				format!(
+					"[[dependencies.{}]]\nmodId=\"{}\"\n{}\n", 
+					mod_info.id, 
+					dependancy,
+					json_to_toml(mod_info.dependency[dependancy]["forge"].clone())
+				).as_str()
 			)
 		}
 	};
@@ -185,17 +190,19 @@ license="{license}"
 	}
 
 	let mut fab_dep = json!({});
-	for value in mod_info.dependency.as_object().unwrap().keys() {
-		fab_dep[value]=if mod_info.dependency[value]["fabricRange"].is_array() {
-			serde_json::Value::Array(mod_info.dependency[value]["fabric"].as_array().unwrap().to_vec())
-		} else {
-			serde_json::Value::String(
-				if mod_info.dependency[value]["fabricRange"].is_null() {
-					"*".to_string()
-				} else {
-					mod_info.dependency[value]["fabric"].as_str().unwrap().to_string()
-				}
-			)
+	if !mod_info.dependency.is_null() {
+		for value in mod_info.dependency.as_object().unwrap().keys() {
+			fab_dep[value]=if mod_info.dependency[value]["fabric"].is_array() {
+				serde_json::Value::Array(mod_info.dependency[value]["fabric"].as_array().unwrap().to_vec())
+			} else {
+				serde_json::Value::String(
+					if mod_info.dependency[value]["fabric"].is_null() {
+						"*".to_string()
+					} else {
+						mod_info.dependency[value]["fabric"].as_str().unwrap().to_string()
+					}
+				)
+			}
 		}
 	};
 	let _ = serde_json::from_str::<serde_json::Value>("mod_info");
