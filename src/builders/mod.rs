@@ -144,7 +144,7 @@ license="{license}"
 	description="{description}"
 	{logo}
 
-{dependancies}
+{dependencies}
 "#,
 			forge_version = escape_toml_string(&mod_info.forge_version),
 			license = escape_toml_string(&mod_info.license),
@@ -154,7 +154,7 @@ license="{license}"
 			authors = escape_toml_string(&mod_info.authors.join(", ")),
 			description = escape_toml_string(&mod_info.description),
 			logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""},
-			dependancies=forge_dep
+			dependencies=forge_dep
 		).as_bytes())?; 
 	}
 
@@ -175,7 +175,7 @@ license="{license}"
 	description="{description}"
 	{logo}
 
-{dependancies}
+{dependencies}
 "#,
 			neo_version = escape_toml_string(&mod_info.neoforge_version),
 			license = escape_toml_string(&mod_info.license),
@@ -185,7 +185,7 @@ license="{license}"
 			authors = escape_toml_string(&mod_info.authors.join(", ")),
 			description = escape_toml_string(&mod_info.description),
 			logo = if mod_info.icon.is_file() {"logoFile=\"icon.png\""} else {""},
-			dependancies=forge_dep 
+			dependencies=forge_dep 
 		).as_bytes())?;
 	}
 
@@ -215,7 +215,7 @@ license="{license}"
 		"description": mod_info.description,
 		"authors": mod_info.authors,
 		"license": mod_info.license,
-		"depends": fab_dep // TODO: !!! DEPENDANCIES 
+		"depends": fab_dep // TODO: !!! dependencies 
 	});
 	if mod_info.icon.is_file() {fabric["icon"] = serde_json::Value::String(mod_info.icon.to_str().unwrap().to_string())}
 

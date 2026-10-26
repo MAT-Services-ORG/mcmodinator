@@ -131,6 +131,6 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 				)
 			})?),
 		paths,//: paths.clone()
-		dependency: json!({}) // TODO: Legacy Dependancies
+		dependency: json!({}) // TODO: Legacy Dependencies
 	})
 }
