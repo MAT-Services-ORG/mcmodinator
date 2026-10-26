@@ -1,7 +1,7 @@
 [package]
 name = "modinator"
 # How to write version numbers: [RELASE]-beta[BETA]-alpha[ALPHA]
-version = "0.1.0-beta.1-alpha.2"
+version = "0.1.0-beta.1-alpha.3"
 edition = "2024"
 
 [dependencies]
