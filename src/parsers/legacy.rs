@@ -10,7 +10,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 		};
 		println!("{}", format!("[ERROR] {}", message).red());
 		io::Error::new(error.kind(), message)
-	})?)?; // Use pack.json on the new parser.
+	})?)?; // Use pack.mcmeta on the new parser.
 
 	let info = settings["mod_info"]
 		.as_table()
@@ -130,7 +130,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 					"settings.toml: paths.icon must be a string",
 				)
 			})?),
-		paths,//: paths.clone()
+		paths,
 		dependency: json!({}) // TODO: Legacy Dependencies
 	})
 }

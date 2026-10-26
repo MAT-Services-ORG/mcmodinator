@@ -215,7 +215,7 @@ license="{license}"
 		"description": mod_info.description,
 		"authors": mod_info.authors,
 		"license": mod_info.license,
-		"depends": fab_dep // TODO: !!! dependencies 
+		"depends": fab_dep 
 	});
 	if mod_info.icon.is_file() {fabric["icon"] = serde_json::Value::String(mod_info.icon.to_str().unwrap().to_string())}
 

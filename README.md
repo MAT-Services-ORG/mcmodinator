@@ -23,37 +23,48 @@ The original project was developed and archived by Tornato, at the name of [Data
 # Configure
 > For informations about the compatibility mode, check the [DatapackModinator](https://github.com/T0RNATO/datapackmodinator) project.
 
-On the new version, configuring the mod is directly via the pack.json file: 
+On the new version, configuring the mod is directly via the pack.mcmeta file: 
 > [!IMPORTANT]
 > Comments aren't supported, remove them before running the modinator. <br>
-> Check [pack.json](https://github.com/MAT-Services-ORG/mcmodinator/blob/main/pack.json) for the non-commented template.
+> Check [pack.mcmeta](https://github.com/MAT-Services-ORG/mcmodinator/blob/main/pack.mcmeta) for the non-commented template.
 ```json
-{ // WARNING: The comments will be considered as errors by serde_json. Do not use them in the final pack.mcmeta.
+{
 	"pack": {
 		"description": "My custom pack",
-		"pack_format": 121, // Formats have actually no uses... Potentially later ?
+		"pack_format": 121, // TODO: Used to define modId="minecraft" dependancy. So... Optional.
 		"supported_formats": {
 			"min_inclusive": 4,
 			"max_inclusive": 121
 		}
 	},
 	"modinator": {
-		"id": "mymod", // Will also be the name of the output file.
+		"id": "mymod", // Will also be the name of the output file, depending of the CLI Arguments.
 		"display_name": "My Mod",
 		"mod_version": "1.0.0",
 		"authors": ["Myself"],
 		"license": "MIT",
 		"forge_version": "[1,)", // https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html are supported as strings for "forge_version" and "neoforge_version". You can also use integers when exact versions.
-		"neoforge_version": "[1,)"
+		"neoforge_version": "[1,)" 
 	},
 	"paths": { // Values can be set to None for none.
 		"icon": "./icon.png",
 		"assets": "./assets/",
 		"data": "./data/",
-		"kubeloader": { // Will require contentpacks.json.
+		"kubeloader": { // // Require KubeLoader
 			"server-js": "./server_scripts/",
 			"client-js": "./client_scripts/",
 			"startup-js": "./startup_scripts/"
+		}
+	},
+	"dependencies": { 
+		"examplemod": { // The identifier of the mod added as a dependency. Forge equivalent: Key modId.
+			"forge": { // https://docs.minecraftforge.net/en/latest/gettingstarted/modfiles/ for more informations.
+				"type": "required", // "required", "", ""
+				"versionRange": "", // Optional The acceptable version range of the language loader, expressed as a Maven Version Range. An empty string matches any version. ("" if none)
+				"ordering": "NONE", // Optional Defines if the mod must load before ("BEFORE") or after ("AFTER") this dependency. If the ordering does not matter, return "NONE"
+				"side": "BOTH" // "BOTH", "CLIENT", "SERVER"
+			},
+			"fabric": "*" // Version Range only. Optional. https://docs.fabricmc.net/develop/loader/fabric-mod-json#dependency-resolution
 		}
 	}
 }

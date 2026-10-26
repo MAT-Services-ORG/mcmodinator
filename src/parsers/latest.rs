@@ -4,18 +4,18 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 	println!("[DBUG] Parsing project archicture...");
 	
 	let settings: serde_json::Value = serde_json::from_str(
-		&fs::read_to_string("pack.json").map_err(|err| {
+		&fs::read_to_string("pack.mcmeta").map_err(|err| {
 			let msg = if err.kind() == io::ErrorKind::NotFound {
-				"\"pack.json\" not found in project".to_string()
+				"\"pack.mcmeta\" not found in project".to_string()
 			} else {
-				format!("Could not read \"pack.json\": {err}")
+				format!("Could not read \"pack.mcmeta\": {err}")
 			};
 			println!("{}", format!("[ERROR] {}", msg).red());
 			io::Error::new(err.kind(), msg)
 		})? 
 	).map_err(|err| {
 		let msg = if err.classify() == serde_json::error::Category::Syntax {
-			"Cannot read \"pack.json\". Have you removed the comments?".to_string()
+			"Cannot read \"pack.mcmeta\". Have you removed the comments?".to_string()
 		} else {
 			err.to_string()
 		};
@@ -70,7 +70,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		authors: settings["modinator"]["authors"]
 			.as_array()
 			.ok_or_else(|| {
-						println!("{}", "[ERROR] PACK.JSON: \"authors\" must be an array:\n	 like: [\"author1\", \"author2\", etc...]".red());
+						println!("{}", "[ERROR] PACK.MCMETA: \"authors\" must be an array:\n	 like: [\"author1\", \"author2\", etc...]".red());
 						io::Error::new(io::ErrorKind::InvalidData, "authors must be an array")
 					})?
 			.iter()
@@ -79,7 +79,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 					.as_str()
 					.map(String::from)
 					.ok_or_else(|| {
-						println!("{}", "[ERROR] PACK.JSON: Each author in \"authors\" must be a string:\n	 like: [\"author1\", \"author2\", etc...]".red());
+						println!("{}", "[ERROR] PACK.MCMETA: Each author in \"authors\" must be a string:\n	 like: [\"author1\", \"author2\", etc...]".red());
 						io::Error::new(io::ErrorKind::InvalidData, "each author must be a string")
 					})
 			})
@@ -104,7 +104,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				}
 			}
 		} else {
-			println!("{}", "[WARN] PACK.JSON: No \"forge_version\" specified. Considering \"\".".yellow());
+			println!("{}", "[WARN] PACK.MCMETA: No \"forge_version\" specified. Considering \"\".".yellow());
 			String::new()
 		},
 		neoforge_version: if !settings["modinator"]["neoforge_version"].is_null() {
@@ -120,7 +120,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				}
 			}
 		} else {
-			println!("{}", "[WARN] PACK.JSON: No \"neoforge_version\" specified. Considering \"\".".yellow());
+			println!("{}", "[WARN] PACK.MCMETA: No \"neoforge_version\" specified. Considering \"\".".yellow());
 			String::new()
 		},
 		icon: PathBuf::from(
@@ -128,10 +128,10 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				settings["paths"]["icon"]
 					.as_str()
 					.ok_or_else(|| {
-						println!("{}", "[ERROR] pack.json[\"paths\"][\"icon\"] must be a string.".red());
+						println!("{}", "[ERROR] PACK.MCMETA[\"paths\"][\"icon\"] must be a string.".red());
 						io::Error::new(
 							io::ErrorKind::InvalidData,
-							"pack.json: paths.icon must be a string",
+							"pack.mcmeta: paths.icon must be a string",
 						)
 					})?
 				}
