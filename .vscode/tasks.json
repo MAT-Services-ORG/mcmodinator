@@ -4,19 +4,24 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "BUILD: x86_64-unknown-linux-musl",
+            "label": "NT BUILD: x86_64-pc-windows-msvc",
             "type": "shell",
-            "command": "cross build --target x86_64-unknown-linux-musl --release & type .\\target\\x86_64-unknown-linux-musl\\release\\modinator > .\\built\\mcmodinator-cli_x86_64-unknown-linux-musl.appimage"
+            "command": "cargo build --release && copy /b .\\target\\release\\modinator.exe .\\built\\mcmodinator-cli_x86_64-pc-windows-msvc.exe"
+        },
+        /*{
+            "label": "VM BUILD: x86_64-pc-windows-msvc",
+            "type": "shell",
+            "command": "cross build --target x86_64-pc-windows-msvc --release && type .\\target\\x86_64-pc-windows-msvc\\release\\modinator > .\\built\\mcmodinator-cli_x86_64-pc-windows-msvc.exe"
+        },*/
+        {
+            "label": "VM BUILD: x86_64-unknown-linux-musl",
+            "type": "shell",
+            "command": "cross build --target x86_64-unknown-linux-musl --release && type .\\target\\x86_64-unknown-linux-musl\\release\\modinator > .\\built\\mcmodinator-cli_x86_64-unknown-linux-musl.appimage"
         },
         {
-            "label": "BUILD: x86_64-pc-windows-msvc",
+            "label": "VM BUILD: x86_64-unknown-linux-gnu",
             "type": "shell",
-            "command": "cross build --target x86_64-pc-windows-msvc --release & type .\\target\\x86_64-pc-windows-msvc\\release\\modinator > .\\built\\mcmodinator-cli_x86_64-pc-windows-msvc.exe"
-        },
-        {
-            "label": "BUILD: x86_64-unknown-linux-gnu",
-            "type": "shell",
-            "command": "cross build --target x86_64-unknown-linux-gnu --release & type .\\target\\x86_64-unknown-linux-gnu\\release\\modinator > .\\built\\mcmodinator-cli_x86_64-unknown-linux-gnu.appimage"
+            "command": "cross build --target x86_64-unknown-linux-gnu --release && type .\\target\\x86_64-unknown-linux-gnu\\release\\modinator > .\\built\\mcmodinator-cli_x86_64-unknown-linux-gnu.appimage"
         }
     ]
 }
