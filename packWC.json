@@ -50,3 +50,5 @@
 		*/ 
 		}
 }
+
+// TODO: Add shell scripts for TUIs that triggers the modinator executable.
