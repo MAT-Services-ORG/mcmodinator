@@ -1,4 +1,5 @@
 /target
+/built
 *.jar
 *.bak
-mcmodinator.code-workspace
+
