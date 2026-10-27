@@ -1,14 +1,8 @@
-```
- __       __  ______       __       __  ______  _______  ______ __    __  ______  ________  ______  _______
-|  \     /  \/      \     |  \     /  \/      \|       \|      \  \  |  \/      \|        \/      \|       \
-| ▓▓\   /  ▓▓  ▓▓▓▓▓▓\    | ▓▓\   /  ▓▓  ▓▓▓▓▓▓\ ▓▓▓▓▓▓▓\\▓▓▓▓▓▓ ▓▓\ | ▓▓  ▓▓▓▓▓▓\\▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓\ ▓▓▓▓▓▓▓\
-| ▓▓▓\ /  ▓▓▓ ▓▓   \▓▓    | ▓▓▓\ /  ▓▓▓ ▓▓  | ▓▓ ▓▓  | ▓▓ | ▓▓ | ▓▓▓\| ▓▓ ▓▓__| ▓▓  | ▓▓  | ▓▓  | ▓▓ ▓▓__| ▓▓
-| ▓▓▓▓\  ▓▓▓▓ ▓▓          | ▓▓▓▓\  ▓▓▓▓ ▓▓  | ▓▓ ▓▓  | ▓▓ | ▓▓ | ▓▓▓▓\ ▓▓ ▓▓    ▓▓  | ▓▓  | ▓▓  | ▓▓ ▓▓    ▓▓
-| ▓▓\▓▓ ▓▓ ▓▓ ▓▓   __     | ▓▓\▓▓ ▓▓ ▓▓ ▓▓  | ▓▓ ▓▓  | ▓▓ | ▓▓ | ▓▓\▓▓ ▓▓ ▓▓▓▓▓▓▓▓  | ▓▓  | ▓▓  | ▓▓ ▓▓▓▓▓▓▓\
-| ▓▓ \▓▓▓| ▓▓ ▓▓__/  \    | ▓▓ \▓▓▓| ▓▓ ▓▓__/ ▓▓ ▓▓__/ ▓▓_| ▓▓_| ▓▓ \▓▓▓▓ ▓▓  | ▓▓  | ▓▓  | ▓▓__/ ▓▓ ▓▓  | ▓▓
-| ▓▓  \▓ | ▓▓\▓▓    ▓▓    | ▓▓  \▓ | ▓▓\▓▓    ▓▓ ▓▓    ▓▓   ▓▓ \ ▓▓  \▓▓▓ ▓▓  | ▓▓  | ▓▓   \▓▓    ▓▓ ▓▓  | ▓▓
- \▓▓      \▓▓ \▓▓▓▓▓▓      \▓▓      \▓▓ \▓▓▓▓▓▓ \▓▓▓▓▓▓▓ \▓▓▓▓▓▓\▓▓   \▓▓\▓▓   \▓▓   \▓▓    \▓▓▓▓▓▓ \▓▓   \▓▓
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="art/header-dark.png">
+  <img alt="MCModinator CLI" src="art/header-light.png">
+</picture>
+
 # Description
 The Modinator is a tool created to create Minecraft Mods using [data](https://datapack.wiki/) and [ressource](https://minecraft.wiki/w/Resource_pack) packs, alied with [KubeLoader](https://github.com/WhiseNT/kubeloader) technologies.
 It's a CLI tool that uses common mods architectures to create "universal" mods.
