@@ -51,4 +51,4 @@
 		}
 }
 
-// TODO: Add shell scripts for TUIs that triggers the modinator executable.
+// TODO: Add shell scripts for TUIs that triggers the modinator executable. (Can be put in relases. So, change the header image description to match TUI instead of CLI.)
