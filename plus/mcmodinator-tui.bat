@@ -1,5 +1,6 @@
 @echo off
-@echo MAT Modinator TUI for Windows V.1
+@set ver="1 WBAT"
+@echo MAT Modinator TUI %ver% for Windows BATCH
 @echo.
 @if EXIST mcmodinator-cli*.exe goto exists
 ECHO [ERROR] MCModinaotr (mcmodinator-cli*.exe) not found in current folder.
@@ -28,6 +29,9 @@ if %INPUT% == d goto d
 echo Invalid input. Retry.
 echo.
 goto exists
+:v
+echo MCModinator TUI V.%ver%
+"%ModinatorFile%" -V
 :build
 set "InputPath="
 set /p "InputPath=Project path (Empty for current folder)  => "
