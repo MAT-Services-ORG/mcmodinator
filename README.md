@@ -64,6 +64,7 @@ On the new version, configuring the mod is directly via the pack.mcmeta file:
 }
 ``` 
 # Using command line
+(For those who aren't familiar with command line, considere using the complementary TUIs files to have a minimal UI.)
 ```
 Usage: modinator [OPTIONS]
 
