@@ -18,8 +18,9 @@ pub fn doc(topic: &str) {
 			format!("{}", "List of topics:".underline().bold())
 		],
 		"PACK": [
-			"Shows informations about PACK.MCMETA structure",
-			"Doccumentation not written yet."
+			"Shows informations about the PACK.MCMETA file structure",
+			"Doccumentation in development.", 
+			"PACK.MCMETA is a file containing metadatas about the pack system. MCModinator use it as project data file to make the project."
 		]
 	}); // TODO: Add topics.
 
