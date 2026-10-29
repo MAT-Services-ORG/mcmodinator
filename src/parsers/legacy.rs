@@ -131,6 +131,6 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>>{
 				)
 			})?),
 		paths,
-		dependency: json!({}) // TODO: Legacy Dependencies
+		dependency: json!({}) // They will no longer be updated.
 	})
 }
