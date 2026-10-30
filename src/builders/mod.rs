@@ -66,6 +66,10 @@ pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: &String) -> R
 	for dependancy in mod_info.dependency.as_object().unwrap_or(
 		json!({}).as_object().unwrap()
 	).keys() {
+		if !matches!(mod_info.dependency[dependancy]["forge"]["type"].as_str().unwrap_or(""), "required" | "optional" | "incompatible" | "discouraged" | "") {
+			println!("{}", format!("[CAUT] {} is not a conventionnal and can became problematic while mod execution !", mod_info.dependency[dependancy]["forge"]["type"].to_string().as_str()).bright_red());
+			println!("{}", "[HELP] For more informations, go to: https://docs.minecraftforge.net/en/latest/gettingstarted/modfiles/".blue());
+		};
 		if !mod_info.dependency[dependancy]["forge"].is_null() {
 			forge_dep.push_str(
 				format!(
