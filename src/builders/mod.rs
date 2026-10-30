@@ -42,40 +42,24 @@ pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: &String) -> R
 	import_folder(mod_info.paths.get("assets"), &mut zip, "Resourcepack Files", "assets")?; // Assets
 
 	if !mod_info.paths["kubeloader"].is_null() { 
-		print!(
-			"{}",
-			format!(
-				"[CAUT] KUBELOADER technology is unfinished, problems can heppends if you chosse to continue.\n       We advise you to check if a relase is aviable: https://github.com/MAT-Services-ORG/mcmodinator/releases\n       Actual version: {}\n       Continue with KL integrations? [y/N]\n  INPUT▐",
-				env!("CARGO_PKG_VERSION")
-			)
-			.bright_red()
-		);
-		io::stdout().flush()?;
-		let mut input = String::new();
-		io::stdin().read_line(&mut input)?;
-		if input.trim().eq_ignore_ascii_case("y") {
-			println!("{}","       Mod: Loading KubeLoader integrations at your risk.".bright_red());
-			import_folder(mod_info.paths["kubeloader"].get("server-js"), &mut zip, "Server Scripts", "contentpacks/server_scripts")?; // server-js
-			import_folder(mod_info.paths["kubeloader"].get("client-js"), &mut zip, "Client Scripts", "contentpacks/client_scripts")?; // client-js
-			import_folder(mod_info.paths["kubeloader"].get("startup-js"), &mut zip, "Startup Scripts", "contentpacks/startup_scripts")?; // startup-js
-			// KUBELOADER metadatas. (Check https://github.com/WhiseNT/kubeloader_wiki-en/wiki/Content-Packs )
+		import_folder(mod_info.paths["kubeloader"].get("server-js"), &mut zip, "Server Scripts", "contentpacks/server_scripts")?; // server-js
+		import_folder(mod_info.paths["kubeloader"].get("client-js"), &mut zip, "Client Scripts", "contentpacks/client_scripts")?; // client-js
+		import_folder(mod_info.paths["kubeloader"].get("startup-js"), &mut zip, "Startup Scripts", "contentpacks/startup_scripts")?; // startup-js
+		// KUBELOADER metadatas. (Check https://github.com/WhiseNT/kubeloader_wiki-en/wiki/Content-Packs )
 
-			zip.start_file("contentpacks/contentpacks.json", SimpleFileOptions::default())?;
-			zip.write_all(
-				serde_json::to_string(&json!({
-					"id": mod_info.id,
-					"version": mod_info.version,
-					"name": mod_info.display_name,
-					"description": mod_info.description,
-					"authors": mod_info.authors
-				}))?
-				.as_bytes()
-			)?;
-			mod_info.dependency["kubeloader"]["forge"]["versionRange"] = "".into(); 
-			mod_info.dependency["kubeloader"]["fabric"] = "*".into(); 
-		} else {
-			println!("{}","       Aborting KubeLoader integration.".yellow());
-		};
+		zip.start_file("contentpacks/contentpacks.json", SimpleFileOptions::default())?;
+		zip.write_all(
+			serde_json::to_string(&json!({
+				"id": mod_info.id,
+				"version": mod_info.version,
+				"name": mod_info.display_name,
+				"description": mod_info.description,
+				"authors": mod_info.authors
+			}))?
+			.as_bytes()
+		)?;
+		mod_info.dependency["kubeloader"]["forge"]["versionRange"] = "".into(); 
+		mod_info.dependency["kubeloader"]["fabric"] = "*".into(); 
 	} 
 
 	let mut forge_dep = String::new();

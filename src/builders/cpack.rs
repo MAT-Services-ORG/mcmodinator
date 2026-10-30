@@ -20,7 +20,6 @@ pub fn build(mod_info: &mut ModInfo, pack_build: &str, output_path: &String) -> 
 	import_folder(mod_info.paths.get("assets"), &mut zip, "Resourcepack Files", "assets")?; // Assets
 
 	if !mod_info.paths["kubeloader"].is_null() { 
-		println!("{}","[CAUT] CPACK: Loading KubeLoader integrations at your risk.".bright_red());
 		import_folder(mod_info.paths["kubeloader"].get("server-js"), &mut zip, "Server Scripts", "server_scripts")?; // server-js
 		import_folder(mod_info.paths["kubeloader"].get("client-js"), &mut zip, "Client Scripts", "client_scripts")?; // client-js
 		import_folder(mod_info.paths["kubeloader"].get("startup-js"), &mut zip, "Startup Scripts", "startup_scripts")?; // startup-js
