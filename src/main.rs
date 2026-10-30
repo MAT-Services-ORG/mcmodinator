@@ -183,7 +183,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	}
 
 	if !matches!(args.mod_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bmod::build(&mut mod_info, args.mod_build.to_lowercase().as_str(), &args.output_path)?}
-	if !matches!(args.cpack_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bcpack::build(&mut mod_info, args.mod_build.to_lowercase().as_str(), &args.output_path)?}
+	if !matches!(args.cpack_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bcpack::build(&mut mod_info, args.cpack_build.to_lowercase().as_str(), &args.output_path)?}
 	println!("{}", "[DONE] Finished execution !".green());
 	Ok(())
 }

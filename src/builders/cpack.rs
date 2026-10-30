@@ -5,7 +5,7 @@ pub fn build(mod_info: &mut ModInfo, pack_build: &str, output_path: &String) -> 
 
 	println!("[INFO] Building KL ContentPack..."); // Create ZIP/JAR
 	let packfilename = match pack_build {
-		"true" | "t" | "yes" | "y" => format!("{output_path}/{}-cpack.jar", mod_info.id),
+		"true" | "t" | "yes" | "y" => format!("{output_path}/{}-cpack.zip", mod_info.id),
 		_ => format!("{output_path}/{pack_build}")
 	};
 	let mut zip = ZipWriter::new(
@@ -26,18 +26,16 @@ pub fn build(mod_info: &mut ModInfo, pack_build: &str, output_path: &String) -> 
 		import_folder(mod_info.paths["kubeloader"].get("startup-js"), &mut zip, "Startup Scripts", "startup_scripts")?; // startup-js
 		// KUBELOADER metadatas. (Check https://github.com/WhiseNT/kubeloader_wiki-en/wiki/Content-Packs )
 
-		let mut dependancies = json!([]);
-		let mut v=0;
+		let mut dependancies = Vec::new();
 		for dependancy in mod_info.dependency.as_object().unwrap_or(
 			json!({}).as_object().unwrap()
 		).keys() {
-			dependancies[v] = json!({ // TOFIX: PANICK HERE !!!
+			dependancies.push(json!({
 				"type": mod_info.dependency[dependancy]["forge"]["type"],
 				"id": dependancy,
 				"versionRange": mod_info.dependency[dependancy]["forge"]["versionRange"]
 
-			});
-			v+=1
+			}));
 		};
 
 		zip.start_file("contentpacks.json", SimpleFileOptions::default())?;
