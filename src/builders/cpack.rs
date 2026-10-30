@@ -65,5 +65,5 @@ pub fn build(mod_info: &mut ModInfo, pack_build: &str, output_path: &String) -> 
 		}
 	}?;
 
-	Ok(()) // TODO: Just... Do it. (Check https://github.com/WhiseNT/kubeloader_wiki-en/wiki/Content-Packs ))
+	Ok(())
 }

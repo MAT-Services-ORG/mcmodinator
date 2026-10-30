@@ -6,7 +6,7 @@
         {
             "label": "NT BUILD: x86_64-pc-windows-msvc",
             "type": "shell",
-            "command": "cargo build --release && copy /b .\\target\\release\\modinator.exe .\\built\\mcmodinator-cli_x86_64-pc-windows-msvc.exe"
+            "command": "cargo build --release && (if not exist .\\built mkdir .\\built) && copy /b .\\target\\release\\modinator.exe .\\built\\mcmodinator-cli_x86_64-pc-windows-msvc.exe"
         },
         /*{
             "label": "VM BUILD: x86_64-pc-windows-msvc",
@@ -16,12 +16,12 @@
         {
             "label": "VM BUILD: x86_64-unknown-linux-musl",
             "type": "shell",
-            "command": "cross build --target x86_64-unknown-linux-musl --release && type .\\target\\x86_64-unknown-linux-musl\\release\\modinator > .\\built\\mcmodinator-cli_x86_64-unknown-linux-musl.appimage"
+            "command": "cross build --target x86_64-unknown-linux-musl --release && (if not exist .\\built mkdir .\\built) && type .\\target\\x86_64-unknown-linux-musl\\release\\modinator > .\\built\\mcmodinator-cli_x86_64-unknown-linux-musl.appimage"
         },
         {
             "label": "VM BUILD: x86_64-unknown-linux-gnu",
             "type": "shell",
-            "command": "cross build --target x86_64-unknown-linux-gnu --release && type .\\target\\x86_64-unknown-linux-gnu\\release\\modinator > .\\built\\mcmodinator-cli_x86_64-unknown-linux-gnu.appimage"
+            "command": "cross build --target x86_64-unknown-linux-gnu --release && (if not exist .\\built mkdir .\\built) && type .\\target\\x86_64-unknown-linux-gnu\\release\\modinator > .\\built\\mcmodinator-cli_x86_64-unknown-linux-gnu.appimage"
         }
     ]
 }
