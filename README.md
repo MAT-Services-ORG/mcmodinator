@@ -8,12 +8,6 @@ The Modinator is a tool created to create Minecraft Mods using [data](https://da
 It's a CLI tool that uses common mods architectures to create "universal" mods.
 The original project was developed and archived by Tornato, at the name of [DatapackModinator](https://github.com/T0RNATO/datapackmodinator), originally writen in Python. This project is actually written in Rust and are in actual development on some new features, improvements and compatibility avancements.
 
-> [!NOTE]
-> Due to the fact than this project stills in development, we advise you to check the [original project releases](https://github.com/T0RNATO/datapackmodinator/releases/latest) to have a working modinator while this one is in development.
-
-> [!IMPORTANT]
-> KubeLoader related functionalities are in development. They cannot be used for now.
-
 # Configure
 > For informations about the compatibility mode, check the [DatapackModinator](https://github.com/T0RNATO/datapackmodinator) project.
 
