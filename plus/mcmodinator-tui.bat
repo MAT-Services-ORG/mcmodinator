@@ -32,6 +32,7 @@ goto exists
 :v
 echo MCModinator TUI V.%ver%
 "%ModinatorFile%" -V
+exit
 :build
 set "InputPath="
 set /p "InputPath=Project path (Empty for current folder)  => "

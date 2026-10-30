@@ -52,8 +52,6 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 		}
 	};
 
-	let dependency = if settings["dependencies"].is_null() {json!({})} else {settings["dependencies"].clone()};
-
 	Ok(ModInfo {
 		id: settings["modinator"]["id"]
 			.as_str()
@@ -147,7 +145,7 @@ pub fn get() -> Result<ModInfo, Box<dyn std::error::Error>> {
 				}
 			),
 		paths: settings["paths"].clone(),
-		dependency
+		dependency: if settings["dependencies"].is_null() {json!({})} else {settings["dependencies"].clone()}
 	})
 	/* PathsSettings will return:
 		assets = "assets/"

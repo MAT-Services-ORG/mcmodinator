@@ -33,7 +33,7 @@
 	"dependencies": { 
 		"examplemod": { // The identifier of the mod added as a dependency. Forge equivalent: Key modId.
 			"forge": { // https://docs.minecraftforge.net/en/latest/gettingstarted/modfiles/ for more informations.
-				"type": "required", // "required", "", "" // REVIEW: Supposed Optional. Found it's utility.
+				"type": "required", // "required", "optional", "incompatible", "discouraged" // TODO: Check if those syntax are valid.
 				"versionRange": "", // Optional The acceptable version range of the language loader, expressed as a Maven Version Range. An empty string matches any version. ("" if none)
 				"ordering": "NONE", // Optional Defines if the mod must load before ("BEFORE") or after ("AFTER") this dependency. If the ordering does not matter, return "NONE"
 				"side": "BOTH" // "BOTH", "CLIENT", "SERVER"
@@ -50,5 +50,3 @@
 		*/ 
 		}
 }
-
-// TODO: Add shell scripts for TUIs that triggers the modinator executable. (Can be put in relases. So, change the header image description to match TUI instead of CLI.)
