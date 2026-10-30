@@ -1,6 +1,6 @@
 // This project is an hanced Rust equivalent of https://github.com/T0RNATO/datapackmodinator/ script.
 // Voir les informations sur le fichier externe pour le tas d'amélioration et d'oublis restants.
-use serde_json::json;
+use serde_json::json; // There was also Map in here, but considered as unsused.
 use std::fs::{self, File};
 use std::io::{self, Write};
 use std::path::Path;
@@ -113,13 +113,17 @@ pub fn escape_toml_string(value: &str) -> String {
     escaped
 }
 
-pub fn json_to_toml(value: serde_json::Value) -> String {
+pub fn json_to_toml(value: serde_json::Value) -> Result<String, Box<std::io::Error>> {
 	let mut ctoml = String::new();
-	for key in value.as_object().unwrap().keys() {
-    	ctoml.push_str(format!("{key}={}", value[key]).as_str());
-		ctoml.push('\n');
-	};
-	ctoml
+	if value.is_object() {
+		for key in value.as_object().unwrap().keys() {
+			ctoml.push_str(format!("{key}={}", value[key]).as_str());
+			ctoml.push('\n');
+		};
+	} else {
+		return Err(Box::new(std::io::Error::new(std::io::ErrorKind::InvalidData, "Value is not JSON.")))
+	}
+	Ok(ctoml)
 }
 
 pub fn import_folder(

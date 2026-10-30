@@ -88,7 +88,10 @@ pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: &String) -> R
 					"[[dependencies.{}]]\nmodId=\"{}\"\n{}\n", 
 					mod_info.id, 
 					dependancy,
-					json_to_toml(mod_info.dependency[dependancy]["forge"].clone())
+					json_to_toml(mod_info.dependency[dependancy]["forge"].clone()).map_err(|_| {
+						println!("{}", "[ERROR] Forge dependency is not a valid JSON object.".red());
+						std::io::Error::new(std::io::ErrorKind::InvalidData, "Forge dependency is not a valid JSON object.")
+					})?
 				).as_str()
 			)
 		}
@@ -162,16 +165,22 @@ license="{license}"
 			println!("{}", "[ERROR] PACK.MCMETA: \"dependencies\" must be a JSON object".red());
 			io::Error::new(io::ErrorKind::InvalidData, "\"dependencies\" must be a JSON object")
 		})?.keys() {
-			fab_dep[value]=if mod_info.dependency[value]["fabric"].is_array() {
-				serde_json::Value::Array(mod_info.dependency[value]["fabric"].as_array().unwrap().to_vec())
-			} else {
-				serde_json::Value::String(
-					if mod_info.dependency[value]["fabric"].is_null() {
-						"*".to_string()
-					} else {
-						mod_info.dependency[value]["fabric"].as_str().unwrap().to_string()
+			if !mod_info.dependency[value]["fabric"].is_null() {
+				fab_dep[value] = match &mod_info.dependency[value]["fabric"] {
+					serde_json::Value::Array(ranges) => {
+						serde_json::Value::Array(ranges.clone())
 					}
-				)
+					serde_json::Value::String(range) => {
+						serde_json::Value::String(range.clone())
+					}
+					_ => {
+						return Err(std::io::Error::new(
+							std::io::ErrorKind::InvalidData,
+							format!("Fabric dependency '{value}' must be a string or an array"),
+						)
+						.into());
+					}
+				};
 			}
 		}
 	};
@@ -194,8 +203,14 @@ license="{license}"
 
 	// Finish ZIP
 	match zip.finish() {
-		Ok(_) => {println!("{}", format!("[DONE] Mod created at {modfilename}").green())},
-		Err(error) => {println!("{}", format!("[ERROR] {error}").red())}
-	}
+		Ok(_) => {
+			println!("{}", format!("[DONE] Mod created at {modfilename}").green());
+			Ok(())
+		},
+		Err(error) => {
+			println!("{}", format!("[ERROR] {error}").red());
+			Err(error)
+		}
+	}?;
 	Ok(())
 }

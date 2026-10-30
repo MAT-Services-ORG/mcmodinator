@@ -55,9 +55,15 @@ pub fn build(mod_info: &mut ModInfo, pack_build: &str, output_path: &String) -> 
 	};
 
 	match zip.finish() {
-		Ok(_) => {println!("{}", format!("[DONE] Mod created at {packfilename}").green())},
-		Err(error) => {println!("{}", format!("[ERROR] {error}").red())}
-	};
+		Ok(_) => {
+			println!("{}", format!("[DONE] Mod created at {packfilename}").green());
+			Ok(())
+		},
+		Err(error) => {
+			println!("{}", format!("[ERROR] {error}").red());
+			Err(error)
+		}
+	}?;
 
 	Ok(()) // TODO: Just... Do it. (Check https://github.com/WhiseNT/kubeloader_wiki-en/wiki/Content-Packs ))
 }
