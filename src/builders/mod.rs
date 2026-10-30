@@ -1,52 +1,17 @@
 use crate::*;
 
-fn import_folder(
-	given_path: Option<&serde_json::value::Value>,
-	zip: &mut ZipWriter<File>,
-	output_name: &str,
-	output_type: &str
-) -> Result<(), Box<dyn std::error::Error>> {
-	if let Some(path) = given_path.and_then(|x| x.as_str()) && !path.is_empty() {
-		match add_folder_to_zip(
-			zip,
-			Path::new(path),
-			output_type,
-		) {
-			Ok(count) => {
-				println!("{}", format!("[INFO] Added {count} {output_name}").blue());
-			}
-			Err(error) => {
-				if error
-					.downcast_ref::<io::Error>()
-					.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
-				{
-					println!("{}", format!("[WARN] {output_name} not found at provided path.").yellow());
-					println!("{}\n{}{}", 
-						"[HELP] For more informations about CLI usage, type:".blue(),
-						"       ▐".blue(),
-						"modinator --help".on_bright_black()
-					);
-					return Ok(());
-				} else {
-					println!("{}", format!("[ERROR] {error}").red());
-					return Err(error);
-				}
-			}
-		}
-	}
-	Ok(())
-}
-pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: String) -> Result<(), Box<dyn std::error::Error>> {
-	println!("[INFO] Building file..."); // Create ZIP/JAR
+pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: &String) -> Result<(), Box<dyn std::error::Error>> {
+	println!("[INFO] Building mod file...");
 	let modfilename = match mod_build {
 		"true" | "t" | "yes" | "y" => format!("{output_path}/{}-mod.jar", mod_info.id),
-		_ => format!("{output_path}/{}", mod_build)
+		_ => format!("{output_path}/{mod_build}")
 	};
-	let file = File::create(&modfilename).map_err(|error| {
-		println!("{}", format!("[ERROR] {}", error).red());
-		io::Error::new(error.kind(), error)
-	})?;
-	let mut zip = ZipWriter::new(file);
+	let mut zip = ZipWriter::new(
+		File::create(&modfilename).map_err(|error| {
+			println!("{}", format!("[ERROR] {}", error).red());
+			io::Error::new(error.kind(), error)
+		})?
+	);
 
 	// Icon
 	if let Some(icon_path) = mod_info.paths.get("icon").and_then(|x| x.as_str()) && !icon_path.is_empty() {
@@ -73,11 +38,8 @@ pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: String) -> Re
 	}
 
 
-	// Data
-	import_folder(mod_info.paths.get("data"), &mut zip, "Datapack Files", "data")?;
-
-	// Assets
-	import_folder(mod_info.paths.get("assets"), &mut zip, "Resourcepack Files", "assets")?;
+	import_folder(mod_info.paths.get("data"), &mut zip, "Datapack Files", "data")?; // Data
+	import_folder(mod_info.paths.get("assets"), &mut zip, "Resourcepack Files", "assets")?; // Assets
 
 	if !mod_info.paths["kubeloader"].is_null() { 
 		print!(
@@ -92,7 +54,7 @@ pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: String) -> Re
 		let mut input = String::new();
 		io::stdin().read_line(&mut input)?;
 		if input.trim().eq_ignore_ascii_case("y") {
-			println!("{}","       Loading KubeLoader integrations at your risk.".bright_red());
+			println!("{}","       Mod: Loading KubeLoader integrations at your risk.".bright_red());
 			import_folder(mod_info.paths["kubeloader"].get("server-js"), &mut zip, "Server Scripts", "contentpacks/server_scripts")?; // server-js
 			import_folder(mod_info.paths["kubeloader"].get("client-js"), &mut zip, "Client Scripts", "contentpacks/client_scripts")?; // client-js
 			import_folder(mod_info.paths["kubeloader"].get("startup-js"), &mut zip, "Startup Scripts", "contentpacks/startup_scripts")?; // startup-js
@@ -105,8 +67,7 @@ pub fn build(mod_info: &mut ModInfo, mod_build: &str, output_path: String) -> Re
 					"version": mod_info.version,
 					"name": mod_info.display_name,
 					"description": mod_info.description,
-					"authors": mod_info.authors,
-					"license": mod_info.license,
+					"authors": mod_info.authors
 				}))?
 				.as_bytes()
 			)?;
@@ -232,8 +193,9 @@ license="{license}"
 	zip.write_all(serde_json::to_string(&fabric)?.as_bytes())?;
 
 	// Finish ZIP
-	zip.finish()?;
-
-	println!("{}", format!("[DONE] Mod created at {modfilename}").green());
+	match zip.finish() {
+		Ok(_) => {println!("{}", format!("[DONE] Mod created at {modfilename}").green())},
+		Err(error) => {println!("{}", format!("[ERROR] {error}").red())}
+	}
 	Ok(())
 }

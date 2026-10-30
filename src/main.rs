@@ -122,6 +122,43 @@ pub fn json_to_toml(value: serde_json::Value) -> String {
 	ctoml
 }
 
+pub fn import_folder(
+	given_path: Option<&serde_json::value::Value>,
+	zip: &mut ZipWriter<File>,
+	output_name: &str,
+	output_type: &str
+) -> Result<(), Box<dyn std::error::Error>> {
+	if let Some(path) = given_path.and_then(|x| x.as_str()) && !path.is_empty() {
+		match add_folder_to_zip(
+			zip,
+			Path::new(path),
+			output_type,
+		) {
+			Ok(count) => {
+				println!("{}", format!("[INFO] Added {count} {output_name}").blue());
+			}
+			Err(error) => {
+				if error
+					.downcast_ref::<io::Error>()
+					.is_some_and(|e| e.kind() == io::ErrorKind::NotFound)
+				{
+					println!("{}", format!("[WARN] {output_name} not found at provided path.").yellow());
+					println!("{}\n{}{}", 
+						"[HELP] For more informations about CLI usage, type:".blue(),
+						"       ▐".blue(),
+						"modinator --help".on_bright_black()
+					);
+					return Ok(());
+				} else {
+					println!("{}", format!("[ERROR] {error}").red());
+					return Err(error);
+				}
+			}
+		}
+	}
+	Ok(())
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 	// Parsing arguments
 	let args: Args = Args::parse();
@@ -135,12 +172,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	println!("MAT Modinator\nModinator status:\n  Project path: {}\n  Input path: {}", args.project_path, args.output_path);
 	std::env::set_current_dir(args.project_path)?;
 
-	let mut mod_info = if args.legacy_parser {
-		plegacy::get()?
-	}
-	else {
-		platest::get()?
-	};
+	let mut mod_info = if args.legacy_parser {plegacy::get()} else {platest::get()}?;
 
 	if !mod_info.icon.is_file() {
 		if mod_info.icon.exists() {
@@ -150,8 +182,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		}
 	}
 
-	if !matches!(args.mod_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bmod::build(&mut mod_info, args.mod_build.to_lowercase().as_str(), args.output_path)?}
-	if !matches!(args.cpack_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bcpack::build(/*&mod_info, args.mod_build.to_lowercase().as_str(), args.output_path*/)?}
+	if !matches!(args.mod_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bmod::build(&mut mod_info, args.mod_build.to_lowercase().as_str(), &args.output_path)?}
+	if !matches!(args.cpack_build.to_lowercase().as_str(), "false" | "f" | "no" | "n" | "none") {bcpack::build(&mut mod_info, args.mod_build.to_lowercase().as_str(), &args.output_path)?}
 	println!("{}", "[DONE] Finished execution !".green());
 	Ok(())
 }
